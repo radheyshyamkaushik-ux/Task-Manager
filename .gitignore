@@ -1,0 +1,14 @@
+# Edge/browser profile data
+.edge-task-manager-shared-profile/
+.edge-task-manager-shot-profile-mobile/
+.edge-task-manager-shot-profile/
+
+# Render screenshots
+.task-manager-render*.png
+.task-manager-shared-render.png
+
+# Unrelated files
+Python/
+serve.bat
+sha256.html
+website.html

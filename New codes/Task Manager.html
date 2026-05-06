@@ -1,0 +1,4791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowTask - Performance Marketing Task Manager</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --panel-soft: #f9fafc;
+      --ink: #1b2430;
+      --muted: #667085;
+      --soft: #98a2b3;
+      --line: #dfe5ee;
+      --line-strong: #cdd6e3;
+      --coral: #f76d57;
+      --coral-soft: #fff0ec;
+      --teal: #12a89d;
+      --teal-soft: #e9f8f6;
+      --blue: #4c7df0;
+      --blue-soft: #eef3ff;
+      --amber: #e9a23b;
+      --amber-soft: #fff7e8;
+      --green: #3aa76d;
+      --green-soft: #ecf8f1;
+      --danger: #dc4c4c;
+      --danger-soft: #fff0f0;
+      --shadow: 0 16px 42px rgba(31, 41, 55, 0.08);
+      --shadow-soft: 0 8px 24px rgba(31, 41, 55, 0.06);
+      --radius: 8px;
+      --sidebar: 252px;
+      --detail: 320px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(245, 247, 250, 0.82) 24rem),
+        var(--bg);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr) var(--detail);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      padding: 22px 18px;
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+      padding: 2px 4px;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      background: var(--ink);
+      border-radius: 8px;
+      box-shadow: 0 10px 22px rgba(27, 36, 48, 0.18);
+      flex: 0 0 auto;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .nav-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 8px 4px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .section-add {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .section-add:hover {
+      color: var(--ink);
+      background: #eef3f8;
+    }
+
+    .nav-item,
+    .project-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 38px;
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-item:hover,
+    .project-item:hover {
+      background: var(--panel-soft);
+      color: var(--ink);
+    }
+
+    .nav-item.active,
+    .project-item.active {
+      color: var(--ink);
+      background: #eef3f8;
+      font-weight: 700;
+    }
+
+    .nav-item.active .icon,
+    .project-item.active .dot {
+      color: var(--coral);
+    }
+
+    .nav-item .count {
+      margin-left: auto;
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: currentColor;
+      color: var(--teal);
+      flex: 0 0 auto;
+    }
+
+    .project-item span:nth-child(2) {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .project-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 4px;
+      align-items: center;
+      border-radius: 8px;
+    }
+
+    .project-row.all-row .project-main {
+      grid-column: 1 / -1;
+    }
+
+    .project-main,
+    .tag-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 38px;
+      width: 100%;
+      min-width: 0;
+      padding: 9px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+      transition: background 160ms ease, color 160ms ease;
+    }
+
+    .project-main:hover,
+    .tag-item:hover {
+      background: var(--panel-soft);
+      color: var(--ink);
+    }
+
+    .project-main.active,
+    .tag-item.active {
+      color: var(--ink);
+      background: #eef3f8;
+      font-weight: 800;
+    }
+
+    .project-main span:nth-child(2),
+    .tag-item span:nth-child(2) {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .collaborator-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 9px;
+      min-height: 42px;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+      transition: background 160ms ease, color 160ms ease;
+    }
+
+    .collaborator-item:hover {
+      background: var(--panel-soft);
+      color: var(--ink);
+    }
+
+    .collaborator-item.active {
+      color: var(--ink);
+      background: #eef3f8;
+      font-weight: 800;
+    }
+
+    .collaborator-avatar {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #ffffff;
+      background: var(--ink);
+      font-size: 10px;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .collaborator-copy {
+      display: grid;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .collaborator-copy strong,
+    .collaborator-copy span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .collaborator-copy strong {
+      color: inherit;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .collaborator-copy span {
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .mini-action {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: var(--soft);
+      background: transparent;
+      opacity: 0.72;
+    }
+
+    .project-row:hover .mini-action {
+      opacity: 1;
+    }
+
+    .mini-action:hover {
+      color: var(--ink);
+      background: #eef3f8;
+    }
+
+    .mini-action.danger:hover {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .tag-count {
+      margin-left: auto;
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tag-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      color: var(--blue);
+      flex: 0 0 auto;
+    }
+
+    .sidebar-card {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .sidebar-card strong {
+      font-size: 13px;
+    }
+
+    .mini-meter {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #edf1f6;
+    }
+
+    .mini-meter span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--teal), var(--coral));
+      width: 62%;
+    }
+
+    .sidebar-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .sidebar-card .button {
+      width: 100%;
+    }
+
+    .sync-card {
+      gap: 10px;
+    }
+
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--soft);
+      flex: 0 0 auto;
+    }
+
+    .sync-dot.online {
+      background: var(--teal);
+    }
+
+    .sync-dot.warn {
+      background: var(--amber);
+    }
+
+    .sync-dot.error {
+      background: var(--danger);
+    }
+
+    .sync-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .sync-actions .button.icon-only {
+      width: 38px;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(210px, 1fr) minmax(180px, 260px) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      z-index: 3;
+    }
+
+    .project-title {
+      min-width: 0;
+    }
+
+    .project-title h2 {
+      margin: 0;
+      font-size: clamp(20px, 1.7vw, 24px);
+      line-height: 1.12;
+      letter-spacing: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .project-title p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search {
+      position: relative;
+      display: flex;
+      align-items: center;
+      color: var(--soft);
+    }
+
+    .search .icon {
+      position: absolute;
+      left: 12px;
+      pointer-events: none;
+    }
+
+    .search input {
+      width: 100%;
+      min-height: 40px;
+      padding: 0 14px 0 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      color: var(--ink);
+      background: var(--panel);
+      box-shadow: 0 1px 0 rgba(31, 41, 55, 0.02);
+      transition: border 160ms ease, box-shadow 160ms ease;
+    }
+
+    .search input:focus {
+      border-color: rgba(18, 168, 157, 0.62);
+      box-shadow: 0 0 0 4px rgba(18, 168, 157, 0.12);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 38px;
+      padding: 0 11px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--panel);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: transform 160ms ease, background 160ms ease, border 160ms ease, box-shadow 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(31, 41, 55, 0.08);
+    }
+
+    .button.secondary {
+      border-color: var(--line);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .button.primary {
+      color: #ffffff;
+      background: var(--coral);
+      box-shadow: 0 10px 22px rgba(247, 109, 87, 0.25);
+    }
+
+    .button.icon-only {
+      width: 38px;
+      padding: 0;
+    }
+
+    .button.danger {
+      color: var(--danger);
+      border-color: rgba(220, 76, 76, 0.22);
+      background: var(--danger-soft);
+    }
+
+    .button.success {
+      color: #ffffff;
+      background: var(--teal);
+      box-shadow: 0 10px 22px rgba(18, 168, 157, 0.22);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 22px;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab {
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      color: var(--ink);
+      background: #eef3f8;
+    }
+
+    .collab-filter {
+      display: inline-grid;
+      grid-template-columns: auto minmax(118px, 170px);
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 4px 4px 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .collab-filter span {
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .collab-filter select {
+      width: 100%;
+      min-height: 30px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 6px;
+      outline: none;
+      color: var(--ink);
+      background: #eef3f8;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .board-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      font-weight: 700;
+    }
+
+    .board-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 0 22px 24px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(184px, 1fr));
+      gap: 12px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .lane {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 190px);
+      max-height: calc(100vh - 190px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.64);
+      overflow: hidden;
+    }
+
+    .lane.drag-over {
+      border-color: rgba(18, 168, 157, 0.55);
+      box-shadow: inset 0 0 0 2px rgba(18, 168, 157, 0.12);
+    }
+
+    .lane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .lane-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      font-weight: 800;
+    }
+
+    .lane-title span:last-child {
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .lane-status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--line-strong);
+      flex: 0 0 auto;
+    }
+
+    .lane-status.backlog {
+      background: var(--blue);
+    }
+
+    .lane-status.progress {
+      background: var(--amber);
+    }
+
+    .lane-status.review {
+      background: var(--teal);
+    }
+
+    .lane-status.done {
+      background: var(--green);
+    }
+
+    .lane-add {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .lane-add:hover {
+      color: var(--ink);
+      background: #eef3f8;
+    }
+
+    .task-list {
+      display: grid;
+      gap: 10px;
+      padding: 10px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      min-height: 140px;
+    }
+
+    .task-card {
+      display: grid;
+      gap: 11px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 6px 16px rgba(31, 41, 55, 0.04);
+      cursor: grab;
+      transition: transform 160ms ease, border 160ms ease, box-shadow 160ms ease;
+    }
+
+    .task-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--line-strong);
+      box-shadow: 0 14px 30px rgba(31, 41, 55, 0.08);
+    }
+
+    .task-card.selected {
+      border-color: rgba(247, 109, 87, 0.54);
+      box-shadow: 0 0 0 3px rgba(247, 109, 87, 0.12), 0 12px 26px rgba(31, 41, 55, 0.08);
+    }
+
+    .task-card.dragging {
+      opacity: 0.55;
+      transform: scale(0.98);
+    }
+
+    .task-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .priority {
+      display: inline-flex;
+      align-items: center;
+      width: max-content;
+      min-height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .priority.high {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .priority.medium {
+      color: #a96500;
+      background: var(--amber-soft);
+    }
+
+    .priority.low {
+      color: var(--teal);
+      background: var(--teal-soft);
+    }
+
+    .task-menu {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--soft);
+      background: transparent;
+    }
+
+    .task-menu:hover {
+      color: var(--ink);
+      background: #eef3f8;
+    }
+
+    .task-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .task-desc {
+      margin: -4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .label-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .label {
+      min-height: 22px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: #f1f4f8;
+      font-size: 11px;
+      font-weight: 700;
+      max-width: 100%;
+    }
+
+    .task-progress {
+      display: grid;
+      gap: 6px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .progress-bar {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #edf1f6;
+    }
+
+    .progress-bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--teal);
+    }
+
+    .task-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #ffffff;
+      background: var(--ink);
+      font-size: 11px;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .avatar.mini {
+      width: 24px;
+      height: 24px;
+      font-size: 10px;
+      box-shadow: 0 0 0 2px var(--panel);
+    }
+
+    .avatar-stack {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .avatar-stack .avatar.mini + .avatar.mini {
+      margin-left: -8px;
+    }
+
+    .shared-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      margin-left: 5px;
+      padding: 0 7px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: #f1f4f8;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      flex: 0 1 auto;
+    }
+
+    .task-meta .meta-item,
+    .task-footer > .meta-item {
+      flex: 0 0 auto;
+    }
+
+    .meta-item span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .empty-lane {
+      display: grid;
+      place-items: center;
+      min-height: 150px;
+      padding: 16px;
+      color: var(--soft);
+      border: 1px dashed var(--line-strong);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.54);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .details {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: 100vh;
+      padding: 20px 18px;
+      border-left: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      overflow-y: auto;
+    }
+
+    .details-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .details-header h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .details-close {
+      display: none;
+    }
+
+    .detail-card,
+    .insight-card {
+      display: grid;
+      gap: 13px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .detail-title {
+      display: grid;
+      gap: 9px;
+    }
+
+    .detail-title h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.28;
+      letter-spacing: 0;
+    }
+
+    .detail-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .assignment-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .assignment-row label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .assignment-row select {
+      width: 100%;
+      min-height: 40px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      color: var(--ink);
+      background: var(--panel);
+    }
+
+    .assignment-row select:focus {
+      border-color: rgba(18, 168, 157, 0.62);
+      box-shadow: 0 0 0 4px rgba(18, 168, 157, 0.12);
+    }
+
+    .shared-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .detail-metric {
+      display: grid;
+      gap: 4px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .detail-metric span {
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .detail-metric strong {
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .subtasks {
+      display: grid;
+      gap: 8px;
+    }
+
+    .subtask-add-row,
+    .subtask-input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .subtask-add-row input,
+    .subtask-input-row input {
+      width: 100%;
+      min-width: 0;
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      color: var(--ink);
+      background: var(--panel);
+    }
+
+    .subtask-add-row input:focus,
+    .subtask-input-row input:focus,
+    .subtask-edit-row input[type="text"]:focus {
+      border-color: rgba(18, 168, 157, 0.62);
+      box-shadow: 0 0 0 4px rgba(18, 168, 157, 0.12);
+    }
+
+    .subtask {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .subtask input {
+      width: 16px;
+      height: 16px;
+      margin: 2px 0 0;
+      accent-color: var(--teal);
+      flex: 0 0 auto;
+    }
+
+    .subtask label {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .subtask input:checked + label {
+      color: var(--ink);
+      text-decoration: line-through;
+      text-decoration-color: rgba(27, 36, 48, 0.42);
+    }
+
+    .subtask-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .subtask-editor {
+      display: grid;
+      gap: 9px;
+    }
+
+    .subtask-edit-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .subtask-edit-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .subtask-edit-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--teal);
+    }
+
+    .subtask-edit-row input[type="text"] {
+      width: 100%;
+      min-width: 0;
+      min-height: 34px;
+      padding: 7px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      color: var(--ink);
+      background: var(--panel);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 8px 1fr;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .timeline-dot {
+      width: 8px;
+      height: 8px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .details-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .details-actions .wide-action {
+      grid-column: 1 / -1;
+    }
+
+    .empty-detail {
+      display: grid;
+      place-items: center;
+      min-height: 280px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-detail svg {
+      margin-bottom: 14px;
+      color: var(--soft);
+    }
+
+    .empty-detail strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .insight-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .insight-row strong {
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.32);
+      backdrop-filter: blur(8px);
+      z-index: 40;
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal {
+      width: min(560px, 100%);
+      max-height: min(720px, calc(100vh - 40px));
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .modal.wide-modal {
+      width: min(720px, 100%);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .modal-body {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .form-row {
+      display: grid;
+      gap: 7px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .form-row label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .form-row.wide {
+      grid-column: 1 / -1;
+    }
+
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
+      width: 100%;
+      min-height: 40px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      color: var(--ink);
+      background: var(--panel);
+      transition: border 160ms ease, box-shadow 160ms ease;
+    }
+
+    .form-row textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .form-row textarea.bulk-lines {
+      min-height: 190px;
+      line-height: 1.55;
+    }
+
+    .form-row textarea.sql-snippet {
+      min-height: 160px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      line-height: 1.5;
+      white-space: pre;
+    }
+
+    .helper-text {
+      margin: -2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tag-editor {
+      display: grid;
+      gap: 9px;
+    }
+
+    .selected-tags,
+    .saved-tags,
+    .tag-manager-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-height: 30px;
+    }
+
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      max-width: 100%;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #f1f4f8;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tag-chip button {
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: inherit;
+      background: transparent;
+    }
+
+    .tag-chip button:hover {
+      color: var(--danger);
+      background: rgba(220, 76, 76, 0.08);
+    }
+
+    .saved-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: var(--panel);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .saved-tag:hover {
+      border-color: rgba(18, 168, 157, 0.45);
+      background: var(--teal-soft);
+    }
+
+    .tag-input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tag-input-row input {
+      min-width: 0;
+    }
+
+    .sync-panel {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .sync-panel strong {
+      font-size: 13px;
+    }
+
+    .sync-link-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .sync-link-row input {
+      min-width: 0;
+    }
+
+    .setup-details {
+      display: grid;
+      gap: 10px;
+    }
+
+    .setup-details summary {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .note-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .note-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(160px, 0.55fr);
+      gap: 12px;
+    }
+
+    .note-group {
+      display: grid;
+      gap: 9px;
+    }
+
+    .note-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .note-item {
+      display: grid;
+      gap: 7px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .note-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .note-item strong {
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .note-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .note-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .empty-inline {
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .bulk-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-row input:focus,
+    .form-row select:focus,
+    .form-row textarea:focus {
+      border-color: rgba(18, 168, 157, 0.62);
+      box-shadow: 0 0 0 4px rgba(18, 168, 157, 0.12);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 18px 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 9px;
+      min-height: 42px;
+      max-width: min(360px, calc(100vw - 40px));
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      z-index: 50;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .toast.show {
+      display: inline-flex;
+      animation: slideIn 220ms ease both;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      stroke-width: 2;
+    }
+
+    .icon.small {
+      width: 15px;
+      height: 15px;
+    }
+
+    .hide-desktop {
+      display: none;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(12px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .app-shell {
+        grid-template-columns: 226px minmax(0, 1fr);
+      }
+
+      .details {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: min(380px, 100vw);
+        z-index: 30;
+        transform: translateX(104%);
+        transition: transform 220ms ease;
+        box-shadow: var(--shadow);
+      }
+
+      body.detail-open .details {
+        transform: translateX(0);
+      }
+
+      .details-close {
+        display: inline-flex;
+      }
+
+      .hide-desktop {
+        display: inline-flex;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        max-height: none;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 16px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav-group.projects {
+        display: none;
+      }
+
+      .nav-group.primary {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .nav-label,
+      .sidebar-card {
+        display: none;
+      }
+
+      .nav-item {
+        justify-content: center;
+        min-width: 0;
+      }
+
+      .nav-item span:not(.count) {
+        display: none;
+      }
+
+      .nav-item .count {
+        margin-left: 0;
+      }
+
+      .main {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .actions .button {
+        flex: 1;
+      }
+
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .collab-filter {
+        width: 100%;
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+
+      .board-stats {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .board-wrap {
+        overflow-x: auto;
+        padding: 0 16px 22px;
+      }
+
+      .board {
+        display: flex;
+        min-width: 0;
+        gap: 12px;
+        scroll-snap-type: x mandatory;
+      }
+
+      .lane {
+        min-width: min(82vw, 340px);
+        max-height: none;
+        min-height: 520px;
+        scroll-snap-align: start;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        font-size: 13px;
+      }
+
+      .sidebar {
+        padding: 14px 12px;
+      }
+
+      .brand h1 {
+        font-size: 16px;
+      }
+
+      .topbar,
+      .toolbar {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: auto auto 1fr;
+      }
+
+      .actions .button.secondary {
+        width: 38px;
+        padding: 0;
+      }
+
+      .actions .button.primary {
+        width: 100%;
+      }
+
+      .actions .button.secondary span {
+        display: none;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .note-tools {
+        grid-template-columns: 1fr;
+      }
+
+      .details {
+        width: 100%;
+      }
+
+      .details-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .toast {
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M6 7.5h7.5M6 12h12M6 16.5h9" />
+            <path d="M18 6l1.5 1.5L22 4.8" />
+          </svg>
+        </div>
+        <div>
+          <h1>FlowTask</h1>
+          <span>Performance marketing workspace</span>
+        </div>
+      </div>
+
+      <nav class="nav-group primary" aria-label="Main">
+        <div class="nav-label">Focus</div>
+        <button class="nav-item active" type="button" data-view="all" title="Workspace">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="7" height="7" rx="2" />
+            <rect x="14" y="4" width="7" height="7" rx="2" />
+            <rect x="3" y="15" width="7" height="5" rx="2" />
+            <rect x="14" y="15" width="7" height="5" rx="2" />
+          </svg>
+          <span>Campaigns</span>
+          <span class="count" data-count="all">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="today" title="Due today">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M8 2v4M16 2v4M3.5 9.5h17" />
+            <rect x="4" y="5" width="16" height="16" rx="3" />
+            <path d="M9 14h.01M12 14h.01M15 14h.01M9 17h.01M12 17h.01" />
+          </svg>
+          <span>Today</span>
+          <span class="count" data-count="today">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="high" title="High priority">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 8v5" />
+            <path d="M12 17h.01" />
+            <path d="M10.3 3.9L2.7 17.1A2 2 0 0 0 4.4 20h15.2a2 2 0 0 0 1.7-2.9L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+          </svg>
+          <span>Urgent</span>
+          <span class="count" data-count="high">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="done" title="Completed">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          <span>Done</span>
+          <span class="count" data-count="done">0</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-card" aria-live="polite">
+        <strong>Notes</strong>
+        <p id="notesSummary">0 saved notes</p>
+        <button class="button secondary" id="openNotesBtn" type="button">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 4h16v16H4z" />
+            <path d="M8 8h8M8 12h8M8 16h5" />
+          </svg>
+          Open notes
+        </button>
+      </div>
+
+      <div class="sidebar-card sync-card" aria-live="polite">
+        <strong>Shared database</strong>
+        <p class="sync-status" id="syncSummary">
+          <span class="sync-dot warn"></span>
+          <span>Local mode</span>
+        </p>
+        <div class="sync-actions">
+          <button class="button secondary" id="openSyncBtn" type="button">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M4 7h16M4 12h16M4 17h10" />
+            </svg>
+            Connect
+          </button>
+          <button class="button secondary icon-only" id="copyShareLinkBtn" type="button" aria-label="Copy workspace link">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2" />
+              <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.2-1.2" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <nav class="nav-group projects" aria-label="Collaborators">
+        <div class="nav-label">
+          <span>Collaborators</span>
+          <button class="section-add" type="button" id="addCollaboratorBtn" aria-label="Add collaborator">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
+        <div class="nav-group" id="collaboratorList"></div>
+      </nav>
+
+      <nav class="nav-group projects" aria-label="Workstreams">
+        <div class="nav-label">
+          <span>Workstreams</span>
+          <button class="section-add" type="button" id="addWorkstreamBtn" aria-label="Add workstream">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
+        <div class="nav-group" id="workstreamList"></div>
+      </nav>
+
+      <nav class="nav-group projects" aria-label="Tags">
+        <div class="nav-label">
+          <span>By tags</span>
+          <button class="section-add" type="button" id="manageTagsBtn" aria-label="Manage saved tags">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
+        <div class="nav-group" id="tagList"></div>
+      </nav>
+
+      <div class="sidebar-card" aria-live="polite">
+        <strong>Launch pulse</strong>
+        <div class="mini-meter"><span id="pulseMeter"></span></div>
+        <p id="pulseText">0% of open subtasks are complete.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="project-title">
+          <h2 id="pageTitle">Campaign board</h2>
+          <p id="pageSubtitle">Plan ad ops, launches, and daily media buying tasks.</p>
+        </div>
+
+        <label class="search" for="searchInput">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="m21 21-4.35-4.35" />
+            <circle cx="11" cy="11" r="7" />
+          </svg>
+          <input id="searchInput" type="search" placeholder="Search tasks, country, channel..." autocomplete="off" />
+        </label>
+
+        <div class="actions">
+          <button class="button secondary" id="resetBtn" type="button">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M3 12a9 9 0 1 0 3-6.7" />
+              <path d="M3 4v6h6" />
+            </svg>
+            <span>Reset</span>
+          </button>
+          <button class="button secondary" id="bulkTaskBtn" type="button">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M8 6h13M8 12h13M8 18h13" />
+              <path d="M3 6h.01M3 12h.01M3 18h.01" />
+            </svg>
+            <span>Bulk add</span>
+          </button>
+          <button class="button primary" id="newTaskBtn" type="button">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Add task
+          </button>
+        </div>
+      </header>
+
+      <section class="toolbar" aria-label="Board filters">
+        <div class="tabs" role="tablist" aria-label="Task filters">
+          <button class="tab active" type="button" role="tab" aria-selected="true" data-filter="all">All work</button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-filter="today">Due today</button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-filter="high">High priority</button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-filter="mine">Assigned to me</button>
+        </div>
+
+        <label class="collab-filter" for="collaboratorFilterInput">
+          <span>View</span>
+          <select id="collaboratorFilterInput"></select>
+        </label>
+
+        <div class="board-stats" id="boardStats" aria-live="polite"></div>
+      </section>
+
+      <section class="board-wrap" aria-label="Task board">
+        <div class="board" id="board"></div>
+      </section>
+    </main>
+
+    <aside class="details" id="detailsPanel" aria-label="Task details">
+      <div class="details-header">
+        <h2>Task details</h2>
+        <button class="button secondary icon-only details-close" id="closeDetailsBtn" type="button" aria-label="Close details">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="detailsContent"></div>
+    </aside>
+  </div>
+
+  <div class="modal-backdrop" id="taskModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <form class="modal" id="taskForm">
+      <div class="modal-header">
+        <h2 id="modalTitle">Create task</h2>
+        <button class="button secondary icon-only" type="button" id="closeModalBtn" aria-label="Close modal">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="taskIdInput" />
+        <div class="form-row">
+          <label for="titleInput">Task title</label>
+          <input id="titleInput" type="text" placeholder="Example: Launch Poland retargeting ads" required maxlength="80" />
+        </div>
+        <div class="form-row">
+          <label for="descriptionInput">Description</label>
+          <textarea id="descriptionInput" placeholder="Add KPI, audience, platform, budget note, or tracking context"></textarea>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="columnInput">Status</label>
+            <select id="columnInput"></select>
+          </div>
+          <div class="form-row">
+            <label for="priorityInput">Priority</label>
+            <select id="priorityInput">
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="projectInput">Workstream</label>
+            <select id="projectInput">
+              <option>Paid Search</option>
+              <option>Retargeting</option>
+              <option>Awareness</option>
+              <option>Lifecycle</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="dueInput">Due date</label>
+            <input id="dueInput" type="date" />
+          </div>
+          <div class="form-row">
+            <label for="assigneeInput">Assignee initials</label>
+            <input id="assigneeInput" type="text" maxlength="3" list="collaboratorOptions" placeholder="RK" required />
+            <datalist id="collaboratorOptions"></datalist>
+          </div>
+          <div class="form-row wide">
+            <label for="labelsInput">Labels</label>
+            <input id="labelsInput" type="hidden" />
+            <div class="tag-editor">
+              <div class="selected-tags" id="selectedTags" aria-live="polite"></div>
+              <div class="tag-input-row">
+                <input id="tagTextInput" type="text" placeholder="Add tags: Google Ads, Poland, ROAS" />
+                <button class="button secondary" type="button" id="addTagToTaskBtn">Add tag</button>
+              </div>
+              <p class="helper-text">Use commas for multiple tags, or choose from saved tags below.</p>
+              <div class="saved-tags" id="savedTagPicker"></div>
+            </div>
+          </div>
+          <div class="form-row wide">
+            <label for="subtaskTextInput">Subtasks</label>
+            <div class="subtask-editor">
+              <div class="subtask-input-row">
+                <input id="subtaskTextInput" type="text" placeholder="Add subtask, e.g. Check pixel and UTM tracking" />
+                <button class="button secondary" type="button" id="addModalSubtaskBtn">Add subtask</button>
+              </div>
+              <div class="subtask-edit-list" id="modalSubtaskList" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button secondary" type="button" id="cancelModalBtn">Cancel</button>
+        <button class="button primary" type="submit">Save task</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="bulkModal" role="dialog" aria-modal="true" aria-labelledby="bulkModalTitle">
+    <form class="modal" id="bulkTaskForm">
+      <div class="modal-header">
+        <h2 id="bulkModalTitle">Bulk add tasks</h2>
+        <button class="button secondary icon-only" type="button" id="closeBulkModalBtn" aria-label="Close bulk task modal">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label for="bulkTasksInput">Tasks, one per line</label>
+          <textarea class="bulk-lines" id="bulkTasksInput" required placeholder="2 hr ads&#10;retargeting Poland&#10;awareness Czech&#10;google ads&#10;mail&#10;Hungary google ads"></textarea>
+          <p class="helper-text">Each line becomes a task. FlowTask will tag countries and channels like Google Ads, retargeting, awareness, and mail.</p>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="bulkColumnInput">Status</label>
+            <select id="bulkColumnInput"></select>
+          </div>
+          <div class="form-row">
+            <label for="bulkPriorityInput">Default priority</label>
+            <select id="bulkPriorityInput">
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="bulkProjectInput">Fallback workstream</label>
+            <select id="bulkProjectInput">
+              <option>Paid Search</option>
+              <option>Retargeting</option>
+              <option>Awareness</option>
+              <option>Lifecycle</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="bulkDueInput">Due date</label>
+            <input id="bulkDueInput" type="date" />
+          </div>
+          <div class="form-row">
+            <label for="bulkAssigneeInput">Assignee initials</label>
+            <input id="bulkAssigneeInput" type="text" maxlength="3" list="collaboratorOptions" value="RK" required />
+          </div>
+          <div class="form-row wide">
+            <label for="bulkLabelInput">Extra label</label>
+            <input id="bulkLabelInput" type="hidden" />
+            <div class="tag-editor">
+              <div class="selected-tags" id="selectedBulkTags" aria-live="polite"></div>
+              <div class="tag-input-row">
+                <input id="bulkTagTextInput" type="text" placeholder="Add tags: Today, Scaling, ROAS" />
+                <button class="button secondary" type="button" id="addBulkTagBtn">Add tag</button>
+              </div>
+              <div class="saved-tags" id="savedBulkTagPicker"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button secondary" type="button" id="cancelBulkModalBtn">Cancel</button>
+        <button class="button primary" type="submit">Create tasks</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="workstreamModal" role="dialog" aria-modal="true" aria-labelledby="workstreamModalTitle">
+    <form class="modal" id="workstreamForm">
+      <div class="modal-header">
+        <h2 id="workstreamModalTitle">Add workstream</h2>
+        <button class="button secondary icon-only" type="button" id="closeWorkstreamModalBtn" aria-label="Close workstream modal">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="workstreamIdInput" />
+        <div class="form-row">
+          <label for="workstreamNameInput">Workstream name</label>
+          <input id="workstreamNameInput" type="text" placeholder="Example: Meta Ads" required maxlength="40" />
+        </div>
+        <div class="form-row">
+          <label for="workstreamColorInput">Color</label>
+          <input id="workstreamColorInput" type="color" value="#12a89d" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button secondary" type="button" id="cancelWorkstreamModalBtn">Cancel</button>
+        <button class="button primary" type="submit">Save workstream</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="tagModal" role="dialog" aria-modal="true" aria-labelledby="tagModalTitle">
+    <form class="modal" id="tagForm">
+      <div class="modal-header">
+        <h2 id="tagModalTitle">Saved tags</h2>
+        <button class="button secondary icon-only" type="button" id="closeTagModalBtn" aria-label="Close tag modal">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label for="savedTagInput">Add saved tags</label>
+          <div class="tag-input-row">
+            <input id="savedTagInput" type="text" placeholder="Google Ads, Poland, ROAS" />
+            <button class="button secondary" type="submit">Add</button>
+          </div>
+          <p class="helper-text">Saved tags appear in task forms and in the By tags sidebar filter.</p>
+        </div>
+        <div class="form-row">
+          <label>Saved tag library</label>
+          <div class="tag-manager-list" id="tagManagerList"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button primary" type="button" id="doneTagModalBtn">Done</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="notesModal" role="dialog" aria-modal="true" aria-labelledby="notesModalTitle">
+    <form class="modal" id="noteForm">
+      <div class="modal-header">
+        <h2 id="notesModalTitle">Saved notes</h2>
+        <button class="button secondary icon-only" type="button" id="closeNotesModalBtn" aria-label="Close notes modal">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="noteIdInput" />
+        <div class="form-row">
+          <label for="noteGroupInput">Group name</label>
+          <input id="noteGroupInput" type="text" list="noteGroupOptions" placeholder="Example: Facebook" maxlength="50" />
+          <datalist id="noteGroupOptions"></datalist>
+        </div>
+        <div class="form-row">
+          <label for="noteTitleInput">Note title</label>
+          <input id="noteTitleInput" type="text" placeholder="Example: Tomorrow checks" maxlength="70" />
+        </div>
+        <div class="form-row">
+          <label for="noteBodyInput">Note</label>
+          <textarea id="noteBodyInput" placeholder="Save campaign reminders, ideas, links, or follow-up notes here." required></textarea>
+        </div>
+        <div class="form-row">
+          <div class="note-tools">
+            <div class="form-row">
+              <label for="noteSearchInput">Search notes</label>
+              <input id="noteSearchInput" type="search" placeholder="Search title or body text" autocomplete="off" />
+            </div>
+            <div class="form-row">
+              <label for="noteGroupFilterInput">Group filter</label>
+              <input id="noteGroupFilterInput" type="text" list="noteGroupOptions" placeholder="All groups" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <label id="notesListLabel">Saved notes</label>
+          <div class="note-list" id="notesList"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button secondary" type="button" id="cancelNotesModalBtn">Close</button>
+        <button class="button secondary" type="button" id="clearNoteEditBtn">New note</button>
+        <button class="button primary" type="submit" id="saveNoteBtn">Save note</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="syncModal" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
+    <form class="modal wide-modal" id="syncForm">
+      <div class="modal-header">
+        <h2 id="syncModalTitle">Shared database</h2>
+        <button class="button secondary icon-only" type="button" id="closeSyncModalBtn" aria-label="Close shared database modal">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="sync-panel">
+          <strong id="syncPanelTitle">Local workspace</strong>
+          <p class="helper-text" id="syncPanelText">Connect Supabase to sync tasks, notes, tags, collaborators, and edits with your colleague.</p>
+          <div class="sync-link-row">
+            <input id="shareLinkInput" type="text" readonly placeholder="Create a workspace link after connecting" />
+            <button class="button secondary" id="copySyncLinkBtn" type="button">Copy link</button>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="supabaseUrlInput">Supabase project URL</label>
+            <input id="supabaseUrlInput" type="url" placeholder="https://your-project.supabase.co" autocomplete="off" />
+          </div>
+          <div class="form-row">
+            <label for="workspaceIdInput">Workspace ID</label>
+            <input id="workspaceIdInput" type="text" placeholder="Auto-created" autocomplete="off" />
+          </div>
+          <div class="form-row wide">
+            <label for="supabaseKeyInput">Supabase anon public key</label>
+            <textarea id="supabaseKeyInput" placeholder="Paste anon/public key"></textarea>
+          </div>
+          <div class="form-row">
+            <label for="syncEmailInput">Login email</label>
+            <input id="syncEmailInput" type="email" placeholder="you@company.com" autocomplete="email" />
+          </div>
+          <div class="form-row">
+            <label>Status</label>
+            <div class="sync-status" id="syncModalStatus">
+              <span class="sync-dot warn"></span>
+              <span>Local mode</span>
+            </div>
+          </div>
+        </div>
+
+        <details class="setup-details">
+          <summary>Database setup SQL</summary>
+          <p class="helper-text">Run this once in Supabase SQL Editor, then save your project URL and anon key above.</p>
+          <textarea class="sql-snippet" id="syncSqlInput" readonly></textarea>
+        </details>
+      </div>
+      <div class="modal-footer">
+        <button class="button secondary" type="button" id="sendLoginLinkBtn">Email login</button>
+        <button class="button secondary" type="button" id="syncNowBtn">Sync now</button>
+        <button class="button primary" type="submit">Save database</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+    <span id="toastText">Saved</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const STORAGE_KEY = "flowtask.performance.tasks.v2";
+    const WORKSTREAM_KEY = "flowtask.performance.workstreams.v1";
+    const SAVED_TAG_KEY = "flowtask.performance.savedTags.v1";
+    const NOTES_KEY = "flowtask.performance.notes.v1";
+    const COLLABORATOR_KEY = "flowtask.performance.collaborators.v1";
+    const SYNC_CONFIG_KEY = "flowtask.performance.syncConfig.v1";
+    const SYNC_WORKSPACE_KEY = "flowtask.performance.workspaceId.v1";
+    const SYNC_DEVICE_KEY = "flowtask.performance.deviceId.v1";
+    const WORKSPACE_TABLE = "flowtask_workspaces";
+    const MY_INITIALS = "RK";
+    const collaboratorPalette = ["#f76d57", "#12a89d", "#4c7df0", "#e9a23b", "#3aa76d", "#6b5ef7"];
+    const syncSql = `create extension if not exists pgcrypto;
+
+create table if not exists public.flowtask_workspaces (
+  id uuid primary key,
+  title text not null default 'FlowTask workspace',
+  data jsonb not null default '{}'::jsonb,
+  updated_by text,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.flowtask_workspaces enable row level security;
+
+drop policy if exists "FlowTask shared read" on public.flowtask_workspaces;
+drop policy if exists "FlowTask shared insert" on public.flowtask_workspaces;
+drop policy if exists "FlowTask shared update" on public.flowtask_workspaces;
+
+create policy "FlowTask shared read"
+on public.flowtask_workspaces
+for select
+to anon, authenticated
+using (true);
+
+create policy "FlowTask shared insert"
+on public.flowtask_workspaces
+for insert
+to anon, authenticated
+with check (true);
+
+create policy "FlowTask shared update"
+on public.flowtask_workspaces
+for update
+to anon, authenticated
+using (true)
+with check (true);
+
+create or replace function public.touch_flowtask_workspace()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists touch_flowtask_workspace on public.flowtask_workspaces;
+create trigger touch_flowtask_workspace
+before update on public.flowtask_workspaces
+for each row execute function public.touch_flowtask_workspace();
+
+do $$
+begin
+  alter publication supabase_realtime add table public.flowtask_workspaces;
+exception
+  when duplicate_object then null;
+end $$;`;
+    const lanes = [
+      { id: "backlog", title: "Backlog", className: "backlog" },
+      { id: "progress", title: "In Progress", className: "progress" },
+      { id: "review", title: "Review", className: "review" },
+      { id: "done", title: "Done", className: "done" }
+    ];
+
+    const today = new Date();
+    const toDateInput = (offset) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() + offset);
+      return date.toISOString().slice(0, 10);
+    };
+
+    const makeId = () => {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+      return `task-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    };
+
+    const cloneTasks = (items) => JSON.parse(JSON.stringify(items));
+    const defaultWorkstreams = [
+      { id: "paid-search", name: "Paid Search", color: "#12a89d" },
+      { id: "retargeting", name: "Retargeting", color: "#4c7df0" },
+      { id: "awareness", name: "Awareness", color: "#e9a23b" },
+      { id: "lifecycle", name: "Lifecycle", color: "#3aa76d" }
+    ];
+    const defaultSavedTags = [
+      "Google Ads",
+      "Meta Ads",
+      "Retargeting",
+      "Awareness",
+      "Mail",
+      "Poland",
+      "Czech",
+      "Hungary",
+      "ROAS",
+      "Testing"
+    ];
+    const defaultCollaborators = [
+      { id: "rk", initials: "RK", name: "Me", color: "#f76d57" },
+      { id: "as", initials: "AS", name: "Colleague", color: "#4c7df0" },
+      { id: "mk", initials: "MK", name: "Creative", color: "#12a89d" },
+      { id: "jp", initials: "JP", name: "Search", color: "#e9a23b" },
+      { id: "ns", initials: "NS", name: "Lifecycle", color: "#6b5ef7" },
+      { id: "av", initials: "AV", name: "Ops", color: "#3aa76d" }
+    ];
+
+    const defaultTasks = [
+      {
+        id: makeId(),
+        title: "Set up 2 hr ads testing window",
+        description: "Prepare a short creative test across top ad sets, watch spend pacing, and pause weak hooks before budget waste compounds.",
+        column: "backlog",
+        priority: "High",
+        project: "Paid Search",
+        assignee: "RK",
+        due: toDateInput(0),
+        labels: ["2 hr ads", "Testing"],
+        comments: 8,
+        avatarColor: "#f76d57",
+        subtasks: [
+          { text: "Pick test campaign and budget cap", done: true },
+          { text: "Check pixel and UTM tracking", done: false },
+          { text: "Review CPC and CTR after 2 hours", done: false }
+        ],
+        activity: ["Added by Radhey", "Budget cap requested", "Tracking checklist linked"]
+      },
+      {
+        id: makeId(),
+        title: "Retargeting Poland audience refresh",
+        description: "Refresh warm audiences for Poland, exclude recent buyers, and prepare new conversion-focused ad copy.",
+        column: "backlog",
+        priority: "Medium",
+        project: "Retargeting",
+        assignee: "AS",
+        due: toDateInput(2),
+        labels: ["Poland", "Retargeting"],
+        comments: 3,
+        avatarColor: "#4c7df0",
+        subtasks: [
+          { text: "Export 30-day site visitors", done: true },
+          { text: "Exclude purchasers and leads", done: true },
+          { text: "QA audience size before launch", done: false }
+        ],
+        activity: ["Audience export completed", "Creative owner tagged"]
+      },
+      {
+        id: makeId(),
+        title: "Launch Czech awareness ad set",
+        description: "Build a Czech top-of-funnel awareness ad set with localized copy, video creative, and reach-based KPI notes.",
+        column: "progress",
+        priority: "High",
+        project: "Awareness",
+        assignee: "MK",
+        due: toDateInput(1),
+        labels: ["Czech", "Awareness"],
+        comments: 11,
+        avatarColor: "#12a89d",
+        subtasks: [
+          { text: "Confirm Czech audience targeting", done: true },
+          { text: "Upload awareness creative", done: true },
+          { text: "Check frequency after launch", done: false }
+        ],
+        activity: ["Moved to In Progress", "Localized copy added", "Needs QA pass"]
+      },
+      {
+        id: makeId(),
+        title: "Audit Google Ads search terms",
+        description: "Review search terms, add negative keywords, and flag expensive queries with no conversions.",
+        column: "progress",
+        priority: "Medium",
+        project: "Paid Search",
+        assignee: "JP",
+        due: toDateInput(4),
+        labels: ["Google Ads", "Search"],
+        comments: 2,
+        avatarColor: "#e9a23b",
+        subtasks: [
+          { text: "Pull last 7 days search terms", done: true },
+          { text: "Add negative keywords", done: false },
+          { text: "Share CPC anomalies", done: false }
+        ],
+        activity: ["Search terms exported", "Negative keyword review started"]
+      },
+      {
+        id: makeId(),
+        title: "Review lifecycle mail follow-up",
+        description: "Check campaign links, subject lines, and audience exclusions before sending the follow-up mail sequence.",
+        column: "review",
+        priority: "Medium",
+        project: "Lifecycle",
+        assignee: "NS",
+        due: toDateInput(0),
+        labels: ["Mail", "Retention"],
+        comments: 6,
+        avatarColor: "#6b5ef7",
+        subtasks: [
+          { text: "Validate links and UTMs", done: true },
+          { text: "Confirm suppression list", done: true },
+          { text: "Approve subject line", done: false }
+        ],
+        activity: ["QA checklist updated", "Lifecycle team mentioned"]
+      },
+      {
+        id: makeId(),
+        title: "Publish Hungary Google Ads launch note",
+        description: "Send the Hungary launch summary with campaign IDs, budget, audience notes, and first 24-hour monitoring plan.",
+        column: "done",
+        priority: "Low",
+        project: "Paid Search",
+        assignee: "AV",
+        due: toDateInput(-1),
+        labels: ["Hungary", "Google Ads"],
+        comments: 4,
+        avatarColor: "#3aa76d",
+        subtasks: [
+          { text: "Collect campaign IDs", done: true },
+          { text: "Add budget and KPI notes", done: true },
+          { text: "Share launch note", done: true }
+        ],
+        activity: ["Launch note sent", "Marked complete"]
+      }
+    ];
+
+    let tasks = loadTasks();
+    let workstreams = loadWorkstreams();
+    let savedTags = loadSavedTags();
+    let notes = loadNotes();
+    let collaborators = loadCollaborators();
+    let modalTags = [];
+    let bulkModalTags = [];
+    let modalSubtasks = [];
+    let syncConfig = loadSyncConfig();
+    let syncState = {
+      client: null,
+      channel: null,
+      user: null,
+      workspaceId: getWorkspaceIdFromUrl() || localStorage.getItem(SYNC_WORKSPACE_KEY) || "",
+      deviceId: localStorage.getItem(SYNC_DEVICE_KEY) || makeId(),
+      loaded: false,
+      applyingRemote: false,
+      savingRemote: false,
+      saveTimer: null,
+      lastRemoteAt: "",
+      status: "local",
+      message: "Local mode"
+    };
+    localStorage.setItem(SYNC_DEVICE_KEY, syncState.deviceId);
+    let state = {
+      filter: "all",
+      navView: "all",
+      project: "all",
+      tag: "all",
+      collaborator: "all",
+      search: "",
+      selectedId: tasks[0]?.id || null,
+      modalColumn: "backlog"
+    };
+
+    const board = document.getElementById("board");
+    const workstreamList = document.getElementById("workstreamList");
+    const tagList = document.getElementById("tagList");
+    const collaboratorList = document.getElementById("collaboratorList");
+    const detailsContent = document.getElementById("detailsContent");
+    const searchInput = document.getElementById("searchInput");
+    const collaboratorFilterInput = document.getElementById("collaboratorFilterInput");
+    const boardStats = document.getElementById("boardStats");
+    const pageTitle = document.getElementById("pageTitle");
+    const pageSubtitle = document.getElementById("pageSubtitle");
+    const taskModal = document.getElementById("taskModal");
+    const taskForm = document.getElementById("taskForm");
+    const modalTitle = document.getElementById("modalTitle");
+    const columnInput = document.getElementById("columnInput");
+    const bulkModal = document.getElementById("bulkModal");
+    const bulkTaskForm = document.getElementById("bulkTaskForm");
+    const bulkColumnInput = document.getElementById("bulkColumnInput");
+    const workstreamModal = document.getElementById("workstreamModal");
+    const workstreamForm = document.getElementById("workstreamForm");
+    const workstreamModalTitle = document.getElementById("workstreamModalTitle");
+    const tagModal = document.getElementById("tagModal");
+    const tagForm = document.getElementById("tagForm");
+    const tagManagerList = document.getElementById("tagManagerList");
+    const syncModal = document.getElementById("syncModal");
+    const syncForm = document.getElementById("syncForm");
+    const syncSummary = document.getElementById("syncSummary");
+    const syncModalStatus = document.getElementById("syncModalStatus");
+    const syncPanelTitle = document.getElementById("syncPanelTitle");
+    const syncPanelText = document.getElementById("syncPanelText");
+    const shareLinkInput = document.getElementById("shareLinkInput");
+    const supabaseUrlInput = document.getElementById("supabaseUrlInput");
+    const supabaseKeyInput = document.getElementById("supabaseKeyInput");
+    const workspaceIdInput = document.getElementById("workspaceIdInput");
+    const syncEmailInput = document.getElementById("syncEmailInput");
+    const syncSqlInput = document.getElementById("syncSqlInput");
+    const notesModal = document.getElementById("notesModal");
+    const noteForm = document.getElementById("noteForm");
+    const notesList = document.getElementById("notesList");
+    const notesSummary = document.getElementById("notesSummary");
+    const noteGroupOptions = document.getElementById("noteGroupOptions");
+    const notesListLabel = document.getElementById("notesListLabel");
+    const saveNoteBtn = document.getElementById("saveNoteBtn");
+    const modalSubtaskList = document.getElementById("modalSubtaskList");
+    const toast = document.getElementById("toast");
+    const toastText = document.getElementById("toastText");
+    const bulkExampleLines = [
+      "2 hr ads",
+      "retargeting Poland",
+      "awareness Czech",
+      "google ads",
+      "mail",
+      "Hungary google ads"
+    ].join("\n");
+
+    function loadTasks() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return defaultTasks.map(normalizeTask);
+      try {
+        const parsed = JSON.parse(saved);
+        const source = Array.isArray(parsed) && parsed.length ? parsed : defaultTasks;
+        return source.map(normalizeTask);
+      } catch {
+        return defaultTasks.map(normalizeTask);
+      }
+    }
+
+    function loadWorkstreams() {
+      const saved = localStorage.getItem(WORKSTREAM_KEY);
+      if (!saved) return cloneTasks(defaultWorkstreams);
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) && parsed.length ? parsed : cloneTasks(defaultWorkstreams);
+      } catch {
+        return cloneTasks(defaultWorkstreams);
+      }
+    }
+
+    function loadSavedTags() {
+      const saved = localStorage.getItem(SAVED_TAG_KEY);
+      if (!saved) return [...defaultSavedTags];
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? mergeTags(defaultSavedTags, parsed) : [...defaultSavedTags];
+      } catch {
+        return [...defaultSavedTags];
+      }
+    }
+
+    function loadNotes() {
+      const saved = localStorage.getItem(NOTES_KEY);
+      if (!saved) return [];
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed.map((note) => ({
+          id: note.id || makeId(),
+          title: note.title || "Quick note",
+          body: note.body || "",
+          group: normalizeName(note.group || "General") || "General",
+          createdAt: note.createdAt || new Date().toISOString(),
+          updatedAt: note.updatedAt || ""
+        })) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function loadSyncConfig() {
+      const saved = localStorage.getItem(SYNC_CONFIG_KEY);
+      if (!saved) return { url: "", key: "", email: "" };
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          url: parsed.url || "",
+          key: parsed.key || "",
+          email: parsed.email || ""
+        };
+      } catch {
+        return { url: "", key: "", email: "" };
+      }
+    }
+
+    function loadCollaborators() {
+      const saved = localStorage.getItem(COLLABORATOR_KEY);
+      let parsed = [];
+      if (saved) {
+        try {
+          parsed = JSON.parse(saved);
+        } catch {
+          parsed = [];
+        }
+      }
+
+      const taskCollaborators = (tasks || []).flatMap((task) => [
+        task.assignee,
+        task.createdBy,
+        ...(task.collaborators || [])
+      ]).filter(Boolean).map((initials) => ({
+        initials,
+        name: normalizeInitials(initials) === MY_INITIALS ? "Me" : "Teammate"
+      }));
+
+      return mergeCollaborators(taskCollaborators, defaultCollaborators, Array.isArray(parsed) ? parsed : []);
+    }
+
+    function saveTasks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function saveWorkstreams() {
+      localStorage.setItem(WORKSTREAM_KEY, JSON.stringify(workstreams));
+    }
+
+    function saveSavedTags() {
+      localStorage.setItem(SAVED_TAG_KEY, JSON.stringify(savedTags));
+    }
+
+    function saveNotes() {
+      localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+    }
+
+    function saveCollaborators() {
+      localStorage.setItem(COLLABORATOR_KEY, JSON.stringify(collaborators));
+    }
+
+    function saveSyncConfig() {
+      localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(syncConfig));
+    }
+
+    function persistLocalWorkspace() {
+      saveTasks();
+      saveWorkstreams();
+      saveSavedTags();
+      saveNotes();
+      saveCollaborators();
+    }
+
+    function icon(name) {
+      const paths = {
+        plus: '<path d="M12 5v14M5 12h14" />',
+        dots: '<path d="M12 6h.01M12 12h.01M12 18h.01" />',
+        calendar: '<path d="M8 2v4M16 2v4M3.5 9.5h17" /><rect x="4" y="5" width="16" height="16" rx="3" />',
+        message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />',
+        check: '<path d="M20 6 9 17l-5-5" />',
+        arrowRight: '<path d="M5 12h14M13 6l6 6-6 6" />',
+        arrowLeft: '<path d="M19 12H5M11 6l-6 6 6 6" />',
+        edit: '<path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />',
+        trash: '<path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" />',
+        spark: '<path d="M12 2l1.6 6.2L20 10l-6.4 1.8L12 18l-1.6-6.2L4 10l6.4-1.8Z" />'
+      };
+      return `<svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">${paths[name] || paths.check}</svg>`;
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "No date";
+      const date = new Date(`${dateString}T00:00:00`);
+      return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    }
+
+    function isToday(dateString) {
+      return dateString === today.toISOString().slice(0, 10);
+    }
+
+    function taskProgress(task) {
+      if (!task.subtasks?.length) return 0;
+      const done = task.subtasks.filter((item) => item.done).length;
+      return Math.round((done / task.subtasks.length) * 100);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function normalizeName(value) {
+      return value.trim().replace(/\s+/g, " ");
+    }
+
+    function normalizeInitials(value) {
+      return String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 3);
+    }
+
+    function normalizeTag(value) {
+      return normalizeName(value).replace(/^#/, "");
+    }
+
+    function uniqueInitials(values) {
+      const map = new Map();
+      values.forEach((value) => {
+        const initials = normalizeInitials(value);
+        if (initials && !map.has(initials)) map.set(initials, initials);
+      });
+      return [...map.values()];
+    }
+
+    function normalizeCollaborator(collaborator, index = 0) {
+      const initials = normalizeInitials(collaborator?.initials || collaborator);
+      if (!initials) return null;
+      return {
+        id: collaborator?.id || initials.toLowerCase(),
+        initials,
+        name: normalizeName(collaborator?.name || (initials === MY_INITIALS ? "Me" : "Teammate")),
+        color: collaborator?.color || collaboratorPalette[index % collaboratorPalette.length]
+      };
+    }
+
+    function mergeCollaborators(...groups) {
+      const map = new Map();
+      groups.flat().forEach((item, index) => {
+        const collaborator = normalizeCollaborator(item, index);
+        if (!collaborator) return;
+        const existing = map.get(collaborator.initials);
+        map.set(collaborator.initials, existing ? { ...existing, ...collaborator } : collaborator);
+      });
+      return [...map.values()].sort((a, b) => {
+        if (a.initials === MY_INITIALS) return -1;
+        if (b.initials === MY_INITIALS) return 1;
+        return a.name.localeCompare(b.name);
+      });
+    }
+
+    function ensureCollaborator(initials, name = "Teammate") {
+      const clean = normalizeInitials(initials);
+      if (!clean) return "";
+      const existing = collaborators.find((item) => item.initials === clean);
+      if (!existing) {
+        collaborators = mergeCollaborators(collaborators, [{
+          id: clean.toLowerCase(),
+          initials: clean,
+          name: normalizeName(name) || "Teammate",
+          color: collaboratorPalette[collaborators.length % collaboratorPalette.length]
+        }]);
+        saveCollaborators();
+      }
+      return clean;
+    }
+
+    function getCollaborator(initials) {
+      const clean = normalizeInitials(initials);
+      return collaborators.find((item) => item.initials === clean) || null;
+    }
+
+    function getCollaboratorLabel(initials) {
+      if (initials === "all") return "All team";
+      const collaborator = getCollaborator(initials);
+      return collaborator ? `${collaborator.name} (${collaborator.initials})` : initials;
+    }
+
+    function getActiveCollaboratorInitials() {
+      return state.collaborator === "all" ? MY_INITIALS : state.collaborator;
+    }
+
+    function getTaskCollaborators(task) {
+      return uniqueInitials([
+        task.createdBy || MY_INITIALS,
+        task.assignee || MY_INITIALS,
+        ...(task.collaborators || [])
+      ]);
+    }
+
+    function taskVisibleToCollaborator(task, initials) {
+      if (initials === "all") return true;
+      return getTaskCollaborators(task).includes(normalizeInitials(initials));
+    }
+
+    function parseTags(value) {
+      return String(value || "")
+        .split(",")
+        .map(normalizeTag)
+        .filter(Boolean);
+    }
+
+    function getWorkspaceIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("workspace") || params.get("flowtask") || "";
+    }
+
+    function setWorkspaceIdInUrl(id) {
+      if (!id) return;
+      const url = new URL(window.location.href);
+      url.searchParams.set("workspace", id);
+      window.history.replaceState({}, "", url.toString());
+    }
+
+    function getShareLink() {
+      if (!syncState.workspaceId) return "";
+      const url = new URL(window.location.href);
+      url.searchParams.set("workspace", syncState.workspaceId);
+      return url.toString();
+    }
+
+    function copyText(value, successMessage = "Copied") {
+      if (!value) {
+        showToast("Create a shared workspace first");
+        return;
+      }
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(value).then(() => showToast(successMessage)).catch(() => showToast(value));
+        return;
+      }
+      showToast(value);
+    }
+
+    function mergeTags(...groups) {
+      const map = new Map();
+      groups.flat().forEach((tag) => {
+        const clean = normalizeTag(tag);
+        if (clean && !map.has(clean.toLowerCase())) {
+          map.set(clean.toLowerCase(), clean);
+        }
+      });
+      return [...map.values()].sort((a, b) => a.localeCompare(b));
+    }
+
+    function getAllTags() {
+      return mergeTags(savedTags, tasks.flatMap((task) => task.labels || []));
+    }
+
+    function addSavedTags(tags) {
+      savedTags = mergeTags(savedTags, tags);
+      saveSavedTags();
+    }
+
+    function syncTagInput(inputId, tags) {
+      document.getElementById(inputId).value = tags.join(", ");
+    }
+
+    function renderTagEditor({ selectedId, savedId, hiddenId, tags, onRemove, onAdd }) {
+      const selected = document.getElementById(selectedId);
+      const saved = document.getElementById(savedId);
+      selected.innerHTML = tags.length
+        ? tags.map((tag) => `
+          <span class="tag-chip">
+            <span>${escapeHtml(tag)}</span>
+            <button type="button" aria-label="Remove ${escapeHtml(tag)}" data-remove-tag="${escapeHtml(tag)}">&times;</button>
+          </span>
+        `).join("")
+        : `<span class="empty-inline">No tags selected</span>`;
+      saved.innerHTML = savedTags.map((tag) => `
+        <button class="saved-tag" type="button" data-pick-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>
+      `).join("");
+      syncTagInput(hiddenId, tags);
+
+      selected.querySelectorAll("[data-remove-tag]").forEach((button) => {
+        button.addEventListener("click", () => onRemove(button.dataset.removeTag));
+      });
+      saved.querySelectorAll("[data-pick-tag]").forEach((button) => {
+        button.addEventListener("click", () => onAdd([button.dataset.pickTag]));
+      });
+    }
+
+    function addTagsToModal(tags) {
+      modalTags = mergeTags(modalTags, tags);
+      addSavedTags(tags);
+      renderTaskTagEditor();
+    }
+
+    function addTagsToBulkModal(tags) {
+      bulkModalTags = mergeTags(bulkModalTags, tags);
+      addSavedTags(tags);
+      renderBulkTagEditor();
+    }
+
+    function renderTaskTagEditor() {
+      renderTagEditor({
+        selectedId: "selectedTags",
+        savedId: "savedTagPicker",
+        hiddenId: "labelsInput",
+        tags: modalTags,
+        onRemove: (tag) => {
+          modalTags = modalTags.filter((item) => item.toLowerCase() !== tag.toLowerCase());
+          renderTaskTagEditor();
+        },
+        onAdd: addTagsToModal
+      });
+    }
+
+    function renderBulkTagEditor() {
+      renderTagEditor({
+        selectedId: "selectedBulkTags",
+        savedId: "savedBulkTagPicker",
+        hiddenId: "bulkLabelInput",
+        tags: bulkModalTags,
+        onRemove: (tag) => {
+          bulkModalTags = bulkModalTags.filter((item) => item.toLowerCase() !== tag.toLowerCase());
+          renderBulkTagEditor();
+        },
+        onAdd: addTagsToBulkModal
+      });
+    }
+
+    function cleanSubtasks(subtasks) {
+      return (subtasks || [])
+        .map((subtask) => ({
+          text: normalizeName(subtask.text || ""),
+          done: Boolean(subtask.done)
+        }))
+        .filter((subtask) => subtask.text);
+    }
+
+    function normalizeTask(task) {
+      const assignee = normalizeInitials(task.assignee) || MY_INITIALS;
+      const createdBy = normalizeInitials(task.createdBy) || MY_INITIALS;
+      return {
+        ...task,
+        assignee,
+        createdBy,
+        comments: Number.isFinite(Number(task.comments)) ? Number(task.comments) : 0,
+        labels: Array.isArray(task.labels) ? task.labels : [],
+        subtasks: cleanSubtasks(task.subtasks),
+        collaborators: uniqueInitials([createdBy, assignee, ...(task.collaborators || [])]),
+        activity: Array.isArray(task.activity) ? task.activity : []
+      };
+    }
+
+    function getWorkspacePayload() {
+      return {
+        version: 1,
+        tasks: tasks.map(normalizeTask),
+        workstreams: cloneTasks(workstreams),
+        savedTags: [...savedTags],
+        notes: cloneTasks(notes),
+        collaborators: cloneTasks(collaborators),
+        savedAt: new Date().toISOString()
+      };
+    }
+
+    function applyWorkspacePayload(data) {
+      if (!data || typeof data !== "object") return;
+      syncState.applyingRemote = true;
+      tasks = Array.isArray(data.tasks) ? data.tasks.map(normalizeTask) : tasks;
+      workstreams = Array.isArray(data.workstreams) && data.workstreams.length ? data.workstreams : workstreams;
+      savedTags = Array.isArray(data.savedTags) ? mergeTags(defaultSavedTags, data.savedTags) : savedTags;
+      notes = Array.isArray(data.notes) ? data.notes.map((note) => ({
+        id: note.id || makeId(),
+        title: note.title || "Quick note",
+        body: note.body || "",
+        group: normalizeName(note.group || "General") || "General",
+        createdAt: note.createdAt || new Date().toISOString(),
+        updatedAt: note.updatedAt || ""
+      })) : notes;
+      collaborators = mergeCollaborators(
+        defaultCollaborators,
+        Array.isArray(data.collaborators) ? data.collaborators : [],
+        tasks.flatMap((task) => getTaskCollaborators(task).map((initials) => ({ initials })))
+      );
+      if (!tasks.some((task) => task.id === state.selectedId)) {
+        state.selectedId = tasks[0]?.id || null;
+      }
+      render();
+      syncState.applyingRemote = false;
+    }
+
+    function addSubtasksToModal(values) {
+      const next = values
+        .flatMap((value) => String(value || "").split(/\r?\n|,/))
+        .map(normalizeName)
+        .filter(Boolean)
+        .map((text) => ({ text, done: false }));
+      modalSubtasks = cleanSubtasks([...modalSubtasks, ...next]);
+      renderModalSubtasks();
+    }
+
+    function renderModalSubtasks() {
+      modalSubtaskList.innerHTML = modalSubtasks.length
+        ? modalSubtasks.map((subtask, index) => `
+          <div class="subtask-edit-row">
+            <input type="checkbox" data-modal-subtask-done="${index}" ${subtask.done ? "checked" : ""} aria-label="Mark subtask complete" />
+            <input type="text" value="${escapeHtml(subtask.text)}" data-modal-subtask-text="${index}" aria-label="Subtask text" />
+            <button class="mini-action danger" type="button" data-modal-subtask-delete="${index}" aria-label="Delete subtask">
+              ${icon("trash")}
+            </button>
+          </div>
+        `).join("")
+        : `<span class="empty-inline">No subtasks yet</span>`;
+
+      modalSubtaskList.querySelectorAll("[data-modal-subtask-done]").forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+          modalSubtasks[Number(checkbox.dataset.modalSubtaskDone)].done = checkbox.checked;
+        });
+      });
+
+      modalSubtaskList.querySelectorAll("[data-modal-subtask-text]").forEach((input) => {
+        input.addEventListener("input", () => {
+          modalSubtasks[Number(input.dataset.modalSubtaskText)].text = input.value;
+        });
+        input.addEventListener("blur", () => {
+          modalSubtasks = cleanSubtasks(modalSubtasks);
+          renderModalSubtasks();
+        });
+      });
+
+      modalSubtaskList.querySelectorAll("[data-modal-subtask-delete]").forEach((button) => {
+        button.addEventListener("click", () => {
+          modalSubtasks.splice(Number(button.dataset.modalSubtaskDelete), 1);
+          renderModalSubtasks();
+        });
+      });
+    }
+
+    function getFilteredTasks() {
+      const query = state.search.trim().toLowerCase();
+      return tasks.filter((task) => {
+        const haystack = [
+          task.title,
+          task.description,
+          task.priority,
+          task.project,
+          task.assignee,
+          ...getTaskCollaborators(task).map(getCollaboratorLabel),
+          ...(task.labels || [])
+        ].join(" ").toLowerCase();
+        const matchesSearch = !query || haystack.includes(query);
+        const matchesProject = state.project === "all" || task.project === state.project;
+        const matchesTag = state.tag === "all" || (task.labels || []).some((label) => label.toLowerCase() === state.tag.toLowerCase());
+        const matchesCollaborator = taskVisibleToCollaborator(task, state.collaborator);
+        const filter = state.filter === "all" ||
+          (state.filter === "today" && isToday(task.due)) ||
+          (state.filter === "high" && task.priority === "High") ||
+          (state.filter === "mine" && task.assignee === MY_INITIALS);
+        const nav = state.navView === "all" ||
+          (state.navView === "today" && isToday(task.due)) ||
+          (state.navView === "high" && task.priority === "High") ||
+          (state.navView === "done" && task.column === "done");
+        return matchesSearch && matchesProject && matchesTag && matchesCollaborator && filter && nav;
+      });
+    }
+
+    function render() {
+      renderSidebarLists();
+      renderCollaboratorList();
+      renderProjectOptions();
+      renderCollaboratorOptions();
+      syncSelectedTaskWithFilters();
+      renderBoard();
+      renderDetails();
+      renderStats();
+      renderCounts();
+      renderNotesSummary();
+      updateShellCopy();
+      renderSyncStatus();
+      persistLocalWorkspace();
+      scheduleRemoteSave();
+    }
+
+    function syncSelectedTaskWithFilters() {
+      const filtered = getFilteredTasks();
+      if (!state.selectedId || !filtered.some((task) => task.id === state.selectedId)) {
+        state.selectedId = filtered[0]?.id || null;
+      }
+    }
+
+    function renderSidebarLists() {
+      const workstreamCounts = workstreams.reduce((acc, workstream) => {
+        acc[workstream.name] = tasks.filter((task) => task.project === workstream.name).length;
+        return acc;
+      }, {});
+
+      workstreamList.innerHTML = `
+        <div class="project-row all-row">
+          <button class="project-main ${state.project === "all" ? "active" : ""}" type="button" data-project="all">
+            <span class="dot" style="color: #f76d57"></span>
+            <span>All workstreams</span>
+            <span class="tag-count">${tasks.length}</span>
+          </button>
+        </div>
+        ${workstreams.map((workstream) => `
+          <div class="project-row">
+            <button class="project-main ${state.project === workstream.name ? "active" : ""}" type="button" data-project="${escapeHtml(workstream.name)}">
+              <span class="dot" style="color: ${escapeHtml(workstream.color)}"></span>
+              <span>${escapeHtml(workstream.name)}</span>
+              <span class="tag-count">${workstreamCounts[workstream.name] || 0}</span>
+            </button>
+            <button class="mini-action" type="button" data-edit-workstream="${escapeHtml(workstream.id)}" aria-label="Rename ${escapeHtml(workstream.name)}">
+              ${icon("edit")}
+            </button>
+            <button class="mini-action danger" type="button" data-delete-workstream="${escapeHtml(workstream.id)}" aria-label="Delete ${escapeHtml(workstream.name)}">
+              ${icon("trash")}
+            </button>
+          </div>
+        `).join("")}
+      `;
+
+      const tagCounts = getAllTags().reduce((acc, tag) => {
+        acc[tag] = tasks.filter((task) => (task.labels || []).some((label) => label.toLowerCase() === tag.toLowerCase())).length;
+        return acc;
+      }, {});
+      tagList.innerHTML = `
+        <button class="tag-item ${state.tag === "all" ? "active" : ""}" type="button" data-tag="all">
+          <span class="tag-dot" style="color:#f76d57"></span>
+          <span>All tags</span>
+          <span class="tag-count">${tasks.length}</span>
+        </button>
+        ${getAllTags().map((tag, index) => `
+          <button class="tag-item ${state.tag === tag ? "active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
+            <span class="tag-dot" style="color:${["#12a89d", "#4c7df0", "#e9a23b", "#3aa76d", "#f76d57"][index % 5]}"></span>
+            <span>${escapeHtml(tag)}</span>
+            <span class="tag-count">${tagCounts[tag] || 0}</span>
+          </button>
+        `).join("")}
+      `;
+
+      workstreamList.querySelectorAll("[data-project]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.project = button.dataset.project;
+          render();
+        });
+      });
+      workstreamList.querySelectorAll("[data-edit-workstream]").forEach((button) => {
+        button.addEventListener("click", () => openWorkstreamModal(workstreams.find((item) => item.id === button.dataset.editWorkstream)));
+      });
+      workstreamList.querySelectorAll("[data-delete-workstream]").forEach((button) => {
+        button.addEventListener("click", () => deleteWorkstream(button.dataset.deleteWorkstream));
+      });
+      tagList.querySelectorAll("[data-tag]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.tag = button.dataset.tag;
+          render();
+        });
+      });
+    }
+
+    function renderCollaboratorList() {
+      const items = [
+        { initials: "all", name: "All team", color: "#1b2430" },
+        ...collaborators
+      ];
+      collaboratorList.innerHTML = items.map((collaborator) => {
+        const isAll = collaborator.initials === "all";
+        const count = isAll
+          ? tasks.length
+          : tasks.filter((task) => taskVisibleToCollaborator(task, collaborator.initials)).length;
+        const subtitle = isAll ? "Every shared task" : `${collaborator.initials} workspace`;
+        return `
+          <button class="collaborator-item ${state.collaborator === collaborator.initials ? "active" : ""}" type="button" data-collaborator="${escapeHtml(collaborator.initials)}">
+            <span class="collaborator-avatar" style="background:${escapeHtml(collaborator.color)}">${escapeHtml(isAll ? "ALL" : collaborator.initials)}</span>
+            <span class="collaborator-copy">
+              <strong>${escapeHtml(collaborator.name)}</strong>
+              <span>${escapeHtml(subtitle)}</span>
+            </span>
+            <span class="tag-count">${count}</span>
+          </button>
+        `;
+      }).join("");
+
+      collaboratorList.querySelectorAll("[data-collaborator]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.collaborator = button.dataset.collaborator;
+          state.filter = "all";
+          render();
+        });
+      });
+    }
+
+    function renderProjectOptions() {
+      const markup = workstreams.map((workstream) => `<option value="${escapeHtml(workstream.name)}">${escapeHtml(workstream.name)}</option>`).join("");
+      document.getElementById("projectInput").innerHTML = markup;
+      document.getElementById("bulkProjectInput").innerHTML = markup;
+    }
+
+    function renderCollaboratorOptions() {
+      const options = collaborators.map((collaborator) => `
+        <option value="${escapeHtml(collaborator.initials)}">${escapeHtml(collaborator.name)}</option>
+      `).join("");
+      document.getElementById("collaboratorOptions").innerHTML = options;
+      collaboratorFilterInput.innerHTML = `
+        <option value="all">All team</option>
+        ${collaborators.map((collaborator) => `<option value="${escapeHtml(collaborator.initials)}">${escapeHtml(collaborator.name)} (${escapeHtml(collaborator.initials)})</option>`).join("")}
+      `;
+      collaboratorFilterInput.value = state.collaborator;
+    }
+
+    function getSyncDotClass() {
+      if (syncState.status === "online") return "online";
+      if (syncState.status === "error") return "error";
+      return "warn";
+    }
+
+    function renderStatusNode(node) {
+      if (!node) return;
+      node.innerHTML = `
+        <span class="sync-dot ${getSyncDotClass()}"></span>
+        <span>${escapeHtml(syncState.message)}</span>
+      `;
+    }
+
+    function renderSyncStatus() {
+      const shareLink = getShareLink();
+      renderStatusNode(syncSummary);
+      renderStatusNode(syncModalStatus);
+      if (shareLinkInput) shareLinkInput.value = shareLink;
+      if (workspaceIdInput && document.activeElement !== workspaceIdInput) workspaceIdInput.value = syncState.workspaceId || "";
+      if (syncPanelTitle) syncPanelTitle.textContent = syncState.workspaceId ? "Shared FlowTask workspace" : "Local workspace";
+      if (syncPanelText) {
+        syncPanelText.textContent = syncState.workspaceId
+          ? `${tasks.length} tasks sync through Supabase. Send the copied link to your colleague.`
+          : "Connect Supabase to sync tasks, notes, tags, collaborators, and edits with your colleague.";
+      }
+    }
+
+    function formatNoteDate(isoString) {
+      if (!isoString) return "Saved note";
+      return new Date(isoString).toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    function renderNotesSummary() {
+      const count = notes.length;
+      const groupCount = getNoteGroups().length;
+      notesSummary.textContent = `${count} saved ${count === 1 ? "note" : "notes"} in ${groupCount || 0} ${groupCount === 1 ? "group" : "groups"}`;
+    }
+
+    function getNoteGroups() {
+      return [...new Set(notes.map((note) => normalizeName(note.group || "General") || "General"))].sort((a, b) => a.localeCompare(b));
+    }
+
+    function renderNoteGroupOptions() {
+      noteGroupOptions.innerHTML = getNoteGroups()
+        .map((group) => `<option value="${escapeHtml(group)}"></option>`)
+        .join("");
+    }
+
+    function getFilteredNotes() {
+      const query = document.getElementById("noteSearchInput")?.value.trim().toLowerCase() || "";
+      const groupFilter = document.getElementById("noteGroupFilterInput")?.value.trim().toLowerCase() || "";
+      return notes.filter((note) => {
+        const group = normalizeName(note.group || "General") || "General";
+        const title = note.title || "";
+        const body = note.body || "";
+        const matchesText = !query || title.toLowerCase().includes(query) || body.toLowerCase().includes(query);
+        const matchesGroup = !groupFilter || group.toLowerCase() === groupFilter;
+        return matchesText && matchesGroup;
+      });
+    }
+
+    function renderNotesList() {
+      renderNoteGroupOptions();
+      const filtered = getFilteredNotes();
+      notesListLabel.textContent = filtered.length === notes.length
+        ? "Saved notes"
+        : `Saved notes (${filtered.length} matched)`;
+
+      if (!notes.length) {
+        notesList.innerHTML = `<span class="empty-inline">No notes saved yet</span>`;
+        return;
+      }
+
+      if (!filtered.length) {
+        notesList.innerHTML = `<span class="empty-inline">No notes match your search</span>`;
+        return;
+      }
+
+      const grouped = filtered.reduce((acc, note) => {
+        const group = normalizeName(note.group || "General") || "General";
+        acc[group] = acc[group] || [];
+        acc[group].push(note);
+        return acc;
+      }, {});
+
+      notesList.innerHTML = Object.keys(grouped).sort((a, b) => a.localeCompare(b)).map((group) => `
+        <section class="note-group">
+          <div class="note-group-header">
+            <span>${escapeHtml(group)}</span>
+            <span>${grouped[group].length} ${grouped[group].length === 1 ? "note" : "notes"}</span>
+          </div>
+          ${grouped[group].map((note) => `
+            <article class="note-item">
+              <div class="note-meta">
+                <span>${note.updatedAt ? `Updated ${formatNoteDate(note.updatedAt)}` : formatNoteDate(note.createdAt)}</span>
+                <span class="note-actions">
+                  <button class="mini-action" type="button" data-edit-note="${escapeHtml(note.id)}" aria-label="Edit note">
+                    ${icon("edit")}
+                  </button>
+                  <button class="mini-action danger" type="button" data-delete-note="${escapeHtml(note.id)}" aria-label="Delete note">
+                    ${icon("trash")}
+                  </button>
+                </span>
+              </div>
+              <strong>${escapeHtml(note.title || "Untitled note")}</strong>
+              <p>${escapeHtml(note.body)}</p>
+            </article>
+          `).join("")}
+        </section>
+      `).join("");
+
+      notesList.querySelectorAll("[data-edit-note]").forEach((button) => {
+        button.addEventListener("click", () => editNote(button.dataset.editNote));
+      });
+
+      notesList.querySelectorAll("[data-delete-note]").forEach((button) => {
+        button.addEventListener("click", () => {
+          notes = notes.filter((note) => note.id !== button.dataset.deleteNote);
+          saveNotes();
+          renderNotesSummary();
+          renderNotesList();
+          clearNoteForm();
+          showToast("Note deleted");
+        });
+      });
+    }
+
+    function renderBoard() {
+      const filtered = getFilteredTasks();
+      board.innerHTML = lanes.map((lane) => {
+        const laneTasks = filtered.filter((task) => task.column === lane.id);
+        return `
+          <section class="lane" data-lane="${lane.id}" aria-labelledby="${lane.id}-heading">
+            <div class="lane-header">
+              <div class="lane-title" id="${lane.id}-heading">
+                <span class="lane-status ${lane.className}"></span>
+                <span>${lane.title}</span>
+                <span>${laneTasks.length}</span>
+              </div>
+              <button class="lane-add" type="button" aria-label="Add task to ${lane.title}" data-add-column="${lane.id}">
+                ${icon("plus")}
+              </button>
+            </div>
+            <div class="task-list" data-list="${lane.id}">
+              ${laneTasks.length ? laneTasks.map(renderTaskCard).join("") : `<div class="empty-lane">Drop work here or create a new task</div>`}
+            </div>
+          </section>
+        `;
+      }).join("");
+
+      board.querySelectorAll(".task-card").forEach((card) => {
+        card.addEventListener("click", () => selectTask(card.dataset.id));
+        card.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectTask(card.dataset.id);
+          }
+        });
+        card.addEventListener("dragstart", handleDragStart);
+        card.addEventListener("dragend", handleDragEnd);
+      });
+
+      board.querySelectorAll(".lane").forEach((lane) => {
+        lane.addEventListener("dragover", handleDragOver);
+        lane.addEventListener("dragleave", handleDragLeave);
+        lane.addEventListener("drop", handleDrop);
+      });
+
+      board.querySelectorAll("[data-add-column]").forEach((button) => {
+        button.addEventListener("click", () => openCreateModal(button.dataset.addColumn));
+      });
+    }
+
+    function renderCollaboratorAvatars(task) {
+      const visible = getTaskCollaborators(task)
+        .map((initials) => getCollaborator(initials) || { initials, name: "Teammate", color: "#1b2430" });
+      const avatars = visible.slice(0, 2).map((collaborator) => `
+        <span class="avatar mini" title="${escapeHtml(collaborator.name)}" style="background:${escapeHtml(collaborator.color)}">${escapeHtml(collaborator.initials)}</span>
+      `).join("");
+      const extra = visible.length > 2 ? `<span class="shared-badge">+${visible.length - 2}</span>` : "";
+      return `<span class="avatar-stack">${avatars}${extra}</span>`;
+    }
+
+    function renderTaskCard(task) {
+      const progress = taskProgress(task);
+      const labels = (task.labels || []).map((label) => `<span class="label">${escapeHtml(label)}</span>`).join("");
+      return `
+        <article class="task-card ${task.id === state.selectedId ? "selected" : ""}" data-id="${task.id}" draggable="true" tabindex="0">
+          <div class="task-top">
+            <span class="priority ${task.priority.toLowerCase()}">${task.priority}</span>
+            <button class="task-menu" type="button" aria-label="Open task actions">${icon("dots")}</button>
+          </div>
+          <h3 class="task-title">${escapeHtml(task.title)}</h3>
+          <p class="task-desc">${escapeHtml(task.description || "No description yet.")}</p>
+          <div class="label-row">${labels}</div>
+          <div class="task-progress" aria-label="${progress}% complete">
+            <div class="progress-meta">
+              <span>${task.subtasks.filter((item) => item.done).length}/${task.subtasks.length} subtasks</span>
+              <span>${progress}%</span>
+            </div>
+            <div class="progress-bar"><span style="width: ${progress}%"></span></div>
+          </div>
+          <footer class="task-footer">
+            <div class="task-meta">
+              ${renderCollaboratorAvatars(task)}
+              <span class="meta-item">${icon("calendar")}<span>${formatDate(task.due)}</span></span>
+            </div>
+            <span class="meta-item">${icon("message")}<span>${task.comments}</span></span>
+          </footer>
+        </article>
+      `;
+    }
+
+    function renderDetails() {
+      const task = tasks.find((item) => item.id === state.selectedId);
+      if (!task) {
+        detailsContent.innerHTML = `
+          <div class="empty-detail">
+            <div>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M5 12h14M12 5v14" />
+              </svg>
+              <strong>No task selected</strong>
+              <span>Choose a card to inspect the work.</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const lane = lanes.find((item) => item.id === task.column);
+      const progress = taskProgress(task);
+      const assignOptions = collaborators.map((collaborator) => `
+        <option value="${escapeHtml(collaborator.initials)}" ${task.assignee === collaborator.initials ? "selected" : ""}>${escapeHtml(collaborator.name)} (${escapeHtml(collaborator.initials)})</option>
+      `).join("");
+      const sharedChips = getTaskCollaborators(task).map((initials) => {
+        const collaborator = getCollaborator(initials) || { initials, name: "Teammate", color: "#1b2430" };
+        return `<span class="tag-chip"><span class="dot" style="color:${escapeHtml(collaborator.color)}"></span>${escapeHtml(collaborator.name)} (${escapeHtml(collaborator.initials)})</span>`;
+      }).join("");
+      detailsContent.innerHTML = `
+        <div class="detail-card">
+          <div class="detail-title">
+            <span class="priority ${task.priority.toLowerCase()}">${task.priority}</span>
+            <h3>${escapeHtml(task.title)}</h3>
+            <p>${escapeHtml(task.description || "No description yet.")}</p>
+          </div>
+          <div class="detail-grid">
+            <div class="detail-metric">
+              <span>Status</span>
+              <strong>${lane?.title || "Backlog"}</strong>
+            </div>
+            <div class="detail-metric">
+              <span>Workstream</span>
+              <strong>${escapeHtml(task.project)}</strong>
+            </div>
+            <div class="detail-metric">
+              <span>Assignee</span>
+              <strong>${escapeHtml(task.assignee)}</strong>
+            </div>
+            <div class="detail-metric">
+              <span>Due</span>
+              <strong>${formatDate(task.due)}</strong>
+            </div>
+          </div>
+          <div class="assignment-row">
+            <label for="detailAssigneeInput">Assign task</label>
+            <select id="detailAssigneeInput">${assignOptions}</select>
+            <div class="shared-chips" aria-label="Task collaborators">${sharedChips}</div>
+          </div>
+          <div class="task-progress">
+            <div class="progress-meta">
+              <span>Completion</span>
+              <span>${progress}%</span>
+            </div>
+            <div class="progress-bar"><span style="width: ${progress}%"></span></div>
+          </div>
+          <div class="details-actions">
+            ${task.column === "done"
+              ? `<button class="button secondary wide-action" type="button" data-action="reopen">${icon("arrowLeft")} Reopen task</button>`
+              : `<button class="button success wide-action" type="button" data-action="markDone">${icon("check")} Mark done</button>`
+            }
+            <button class="button secondary" type="button" data-action="moveBack">${icon("arrowLeft")} Move back</button>
+            <button class="button secondary" type="button" data-action="moveNext">Move next ${icon("arrowRight")}</button>
+            <button class="button secondary" type="button" data-action="edit">${icon("edit")} Edit</button>
+            <button class="button danger" type="button" data-action="delete">${icon("trash")} Delete</button>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h4 class="section-title">Subtasks <span>${task.subtasks.filter((item) => item.done).length}/${task.subtasks.length}</span></h4>
+          <div class="subtask-add-row">
+            <input id="detailSubtaskInput" type="text" placeholder="Add subtask" />
+            <button class="button secondary" type="button" id="detailAddSubtaskBtn">Add</button>
+          </div>
+          <div class="subtasks">
+            ${task.subtasks.length ? task.subtasks.map((subtask, index) => `
+              <div class="subtask">
+                <input type="checkbox" id="subtask-${index}" data-toggle-subtask="${index}" ${subtask.done ? "checked" : ""} />
+                <label for="subtask-${index}">${escapeHtml(subtask.text)}</label>
+                <span class="subtask-actions">
+                  <button class="mini-action" type="button" data-edit-subtask="${index}" aria-label="Edit subtask">
+                    ${icon("edit")}
+                  </button>
+                  <button class="mini-action danger" type="button" data-delete-subtask="${index}" aria-label="Delete subtask">
+                    ${icon("trash")}
+                  </button>
+                </span>
+              </div>
+            `).join("") : `<span class="empty-inline">No subtasks yet</span>`}
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <h4 class="section-title">Activity</h4>
+          <div class="timeline">
+            ${(task.activity || []).map((item) => `
+              <div class="timeline-item">
+                <span class="timeline-dot"></span>
+                <span>${escapeHtml(item)}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+
+      detailsContent.querySelectorAll("[data-toggle-subtask]").forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+          const subtask = task.subtasks[Number(checkbox.dataset.toggleSubtask)];
+          subtask.done = checkbox.checked;
+          task.activity = [`${subtask.done ? "Completed" : "Reopened"} "${subtask.text}"`, ...(task.activity || []).slice(0, 4)];
+          render();
+        });
+      });
+
+      const detailSubtaskInput = detailsContent.querySelector("#detailSubtaskInput");
+      const addDetailSubtask = () => {
+        const text = normalizeName(detailSubtaskInput.value);
+        if (!text) return;
+        task.subtasks.push({ text, done: false });
+        task.activity = [`Added subtask "${text}"`, ...(task.activity || []).slice(0, 4)];
+        render();
+      };
+      detailsContent.querySelector("#detailAddSubtaskBtn").addEventListener("click", addDetailSubtask);
+      detailSubtaskInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          addDetailSubtask();
+        }
+      });
+
+      detailsContent.querySelector("#detailAssigneeInput").addEventListener("change", (event) => {
+        assignTask(task.id, event.target.value);
+      });
+
+      detailsContent.querySelectorAll("[data-edit-subtask]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.editSubtask);
+          const current = task.subtasks[index];
+          const updated = normalizeName(window.prompt("Edit subtask", current.text) || "");
+          if (!updated) return;
+          current.text = updated;
+          task.activity = [`Updated subtask "${updated}"`, ...(task.activity || []).slice(0, 4)];
+          render();
+        });
+      });
+
+      detailsContent.querySelectorAll("[data-delete-subtask]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.deleteSubtask);
+          const removed = task.subtasks[index]?.text || "subtask";
+          task.subtasks.splice(index, 1);
+          task.activity = [`Deleted subtask "${removed}"`, ...(task.activity || []).slice(0, 4)];
+          render();
+        });
+      });
+
+      detailsContent.querySelectorAll("[data-action]").forEach((button) => {
+        button.addEventListener("click", () => handleDetailAction(button.dataset.action, task.id));
+      });
+    }
+
+    function renderStats() {
+      const filtered = getFilteredTasks();
+      const open = filtered.filter((task) => task.column !== "done").length;
+      const dueToday = filtered.filter((task) => isToday(task.due)).length;
+      const high = filtered.filter((task) => task.priority === "High").length;
+      const completed = tasks.filter((task) => task.column === "done").length;
+      const total = tasks.length || 1;
+
+      boardStats.innerHTML = `
+        <span class="stat-pill">${icon("spark")} ${filtered.length} visible</span>
+        <span class="stat-pill">${open} open</span>
+        <span class="stat-pill">${dueToday} due today</span>
+        <span class="stat-pill">${high} urgent</span>
+      `;
+
+      const allSubtasks = tasks.flatMap((task) => task.subtasks || []);
+      const doneSubtasks = allSubtasks.filter((item) => item.done).length;
+      const pulse = allSubtasks.length ? Math.round((doneSubtasks / allSubtasks.length) * 100) : 0;
+      document.getElementById("pulseMeter").style.width = `${pulse}%`;
+      document.getElementById("pulseText").textContent = `${pulse}% of subtasks are complete across ${total} campaign tasks.`;
+
+      pageSubtitle.textContent = `${completed}/${tasks.length} complete. ${filtered.length} visible for ${getCollaboratorLabel(state.collaborator)}.`;
+    }
+
+    function renderCounts() {
+      const counts = {
+        all: tasks.length,
+        today: tasks.filter((task) => isToday(task.due)).length,
+        high: tasks.filter((task) => task.priority === "High").length,
+        done: tasks.filter((task) => task.column === "done").length
+      };
+      document.querySelectorAll("[data-count]").forEach((node) => {
+        node.textContent = counts[node.dataset.count] || 0;
+      });
+    }
+
+    function updateShellCopy() {
+      const projectName = state.project === "all" ? "Campaign board" : `${state.project} tasks`;
+      const tagName = state.tag === "all" ? "" : ` - ${state.tag}`;
+      const collaboratorName = state.collaborator === "all" ? "" : ` - ${getCollaboratorLabel(state.collaborator)}`;
+      pageTitle.textContent = `${projectName}${tagName}${collaboratorName}`;
+
+      document.querySelectorAll(".tab").forEach((tab) => {
+        const active = tab.dataset.filter === state.filter;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        item.classList.toggle("active", item.dataset.view === state.navView);
+      });
+
+    }
+
+    function selectTask(id) {
+      state.selectedId = id;
+      if (window.matchMedia("(max-width: 1180px)").matches) {
+        document.body.classList.add("detail-open");
+      }
+      render();
+    }
+
+    function handleDragStart(event) {
+      event.currentTarget.classList.add("dragging");
+      event.dataTransfer.setData("text/plain", event.currentTarget.dataset.id);
+      event.dataTransfer.effectAllowed = "move";
+    }
+
+    function handleDragEnd(event) {
+      event.currentTarget.classList.remove("dragging");
+      document.querySelectorAll(".lane").forEach((lane) => lane.classList.remove("drag-over"));
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.currentTarget.classList.add("drag-over");
+    }
+
+    function handleDragLeave(event) {
+      if (!event.currentTarget.contains(event.relatedTarget)) {
+        event.currentTarget.classList.remove("drag-over");
+      }
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+      const lane = event.currentTarget;
+      const id = event.dataTransfer.getData("text/plain");
+      const task = tasks.find((item) => item.id === id);
+      if (task && task.column !== lane.dataset.lane) {
+        const nextLane = lanes.find((item) => item.id === lane.dataset.lane);
+        task.column = lane.dataset.lane;
+        task.activity = [`Moved to ${nextLane.title}`, ...(task.activity || []).slice(0, 4)];
+        state.selectedId = task.id;
+        showToast(`Moved to ${nextLane.title}`);
+      }
+      lane.classList.remove("drag-over");
+      render();
+    }
+
+    function handleDetailAction(action, id) {
+      const task = tasks.find((item) => item.id === id);
+      if (!task) return;
+      const index = lanes.findIndex((lane) => lane.id === task.column);
+
+      if (action === "moveBack" && index > 0) {
+        task.column = lanes[index - 1].id;
+        task.activity = [`Moved to ${lanes[index - 1].title}`, ...(task.activity || []).slice(0, 4)];
+        showToast(`Moved to ${lanes[index - 1].title}`);
+      }
+
+      if (action === "moveNext" && index < lanes.length - 1) {
+        task.column = lanes[index + 1].id;
+        task.activity = [`Moved to ${lanes[index + 1].title}`, ...(task.activity || []).slice(0, 4)];
+        showToast(`Moved to ${lanes[index + 1].title}`);
+      }
+
+      if (action === "markDone") {
+        task.column = "done";
+        task.subtasks = (task.subtasks || []).map((subtask) => ({ ...subtask, done: true }));
+        task.activity = ["Marked done from task details", ...(task.activity || []).slice(0, 4)];
+        showToast("Task marked done");
+      }
+
+      if (action === "reopen") {
+        task.column = "backlog";
+        task.activity = ["Reopened from task details", ...(task.activity || []).slice(0, 4)];
+        showToast("Task reopened");
+      }
+
+      if (action === "edit") {
+        openEditModal(task);
+        return;
+      }
+
+      if (action === "delete") {
+        tasks = tasks.filter((item) => item.id !== id);
+        state.selectedId = tasks[0]?.id || null;
+        document.body.classList.remove("detail-open");
+        showToast("Task deleted");
+      }
+
+      render();
+    }
+
+    function assignTask(id, assigneeInitials) {
+      const task = tasks.find((item) => item.id === id);
+      const assignee = ensureCollaborator(assigneeInitials);
+      if (!task || !assignee) return;
+      const actor = getActiveCollaboratorInitials();
+      ensureCollaborator(actor, actor === MY_INITIALS ? "Me" : "Teammate");
+      task.assignee = assignee;
+      task.collaborators = uniqueInitials([task.createdBy || actor, actor, assignee]);
+      task.activity = [`Assigned to ${assignee}`, ...(task.activity || []).slice(0, 4)];
+      showToast(`Assigned to ${assignee}`);
+      render();
+    }
+
+    function findWorkstreamName(name, fallback = workstreams[0]?.name || "Paid Search") {
+      return workstreams.find((item) => item.name.toLowerCase() === name.toLowerCase())?.name || fallback;
+    }
+
+    function openWorkstreamModal(workstream = null) {
+      workstreamForm.reset();
+      document.getElementById("workstreamIdInput").value = workstream?.id || "";
+      document.getElementById("workstreamNameInput").value = workstream?.name || "";
+      document.getElementById("workstreamColorInput").value = workstream?.color || "#12a89d";
+      workstreamModalTitle.textContent = workstream ? "Update workstream" : "Add workstream";
+      workstreamModal.classList.add("open");
+      setTimeout(() => document.getElementById("workstreamNameInput").focus(), 40);
+    }
+
+    function closeWorkstreamModal() {
+      workstreamModal.classList.remove("open");
+    }
+
+    function deleteWorkstream(id) {
+      const workstream = workstreams.find((item) => item.id === id);
+      if (!workstream) return;
+      if (workstreams.length === 1) {
+        showToast("Keep at least one workstream");
+        return;
+      }
+      const fallback = workstreams.find((item) => item.id !== id);
+      const confirmed = window.confirm(`Delete "${workstream.name}"? Existing tasks will move to "${fallback.name}".`);
+      if (!confirmed) return;
+      tasks.forEach((task) => {
+        if (task.project === workstream.name) {
+          task.project = fallback.name;
+          task.activity = [`Moved from deleted workstream ${workstream.name}`, ...(task.activity || []).slice(0, 4)];
+        }
+      });
+      workstreams = workstreams.filter((item) => item.id !== id);
+      if (state.project === workstream.name) state.project = fallback.name;
+      showToast("Workstream deleted");
+      render();
+    }
+
+    function openTagModal() {
+      renderTagManager();
+      tagModal.classList.add("open");
+      setTimeout(() => document.getElementById("savedTagInput").focus(), 40);
+    }
+
+    function closeTagModal() {
+      tagModal.classList.remove("open");
+    }
+
+    function addCollaboratorFromPrompt() {
+      const initials = normalizeInitials(window.prompt("Teammate initials", "AS"));
+      if (!initials) return;
+      const existing = getCollaborator(initials);
+      if (existing) {
+        state.collaborator = initials;
+        showToast(`${initials} selected`);
+        render();
+        return;
+      }
+      const name = normalizeName(window.prompt("Teammate name", "Colleague") || "Teammate");
+      collaborators = mergeCollaborators(collaborators, [{
+        id: initials.toLowerCase(),
+        initials,
+        name: name || "Teammate",
+        color: collaboratorPalette[collaborators.length % collaboratorPalette.length]
+      }]);
+      state.collaborator = initials;
+      showToast("Collaborator added");
+      render();
+    }
+
+    function openNotesModal() {
+      clearNoteForm();
+      document.getElementById("noteSearchInput").value = "";
+      document.getElementById("noteGroupFilterInput").value = "";
+      renderNotesList();
+      notesModal.classList.add("open");
+      setTimeout(() => document.getElementById("noteBodyInput").focus(), 40);
+    }
+
+    function closeNotesModal() {
+      notesModal.classList.remove("open");
+    }
+
+    function clearNoteForm() {
+      document.getElementById("noteIdInput").value = "";
+      document.getElementById("noteGroupInput").value = "";
+      document.getElementById("noteTitleInput").value = "";
+      document.getElementById("noteBodyInput").value = "";
+      saveNoteBtn.textContent = "Save note";
+    }
+
+    function editNote(id) {
+      const note = notes.find((item) => item.id === id);
+      if (!note) return;
+      document.getElementById("noteIdInput").value = note.id;
+      document.getElementById("noteGroupInput").value = normalizeName(note.group || "General") || "General";
+      document.getElementById("noteTitleInput").value = note.title || "";
+      document.getElementById("noteBodyInput").value = note.body || "";
+      saveNoteBtn.textContent = "Update note";
+      document.getElementById("noteBodyInput").focus();
+    }
+
+    function renderTagManager() {
+      const tags = savedTags;
+      tagManagerList.innerHTML = tags.length
+        ? tags.map((tag) => `
+          <span class="tag-chip">
+            <span>${escapeHtml(tag)}</span>
+            <button type="button" aria-label="Remove saved tag ${escapeHtml(tag)}" data-remove-saved-tag="${escapeHtml(tag)}">&times;</button>
+          </span>
+        `).join("")
+        : `<span class="empty-inline">No saved tags yet</span>`;
+
+      tagManagerList.querySelectorAll("[data-remove-saved-tag]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const tag = button.dataset.removeSavedTag;
+          savedTags = savedTags.filter((item) => item.toLowerCase() !== tag.toLowerCase());
+          if (state.tag.toLowerCase() === tag.toLowerCase()) state.tag = "all";
+          saveSavedTags();
+          renderTagManager();
+          render();
+        });
+      });
+    }
+
+    function getDefaultWorkstream() {
+      return state.project === "all" ? (workstreams[0]?.name || "Paid Search") : state.project;
+    }
+
+    function titleCaseFirst(value) {
+      const clean = value.trim().replace(/\s+/g, " ");
+      return clean ? `${clean.charAt(0).toUpperCase()}${clean.slice(1)}` : clean;
+    }
+
+    function inferBulkTaskMeta(title, fallbackProject, fallbackPriority, extraLabels) {
+      const lower = title.toLowerCase();
+      let project = fallbackProject;
+      let priority = fallbackPriority;
+      const labels = new Set(extraLabels);
+
+      if (lower.includes("retarget")) {
+        project = findWorkstreamName("Retargeting", project);
+        labels.add("Retargeting");
+      }
+
+      if (lower.includes("awareness")) {
+        project = findWorkstreamName("Awareness", project);
+        labels.add("Awareness");
+      }
+
+      if (lower.includes("mail") || lower.includes("email")) {
+        project = findWorkstreamName("Lifecycle", project);
+        labels.add("Mail");
+      }
+
+      if (lower.includes("google")) {
+        project = findWorkstreamName("Paid Search", project);
+        labels.add("Google Ads");
+      }
+
+      if (lower.includes("ads") || lower.includes("ad ")) {
+        labels.add("Ads");
+      }
+
+      if (lower.includes("2 hr") || lower.includes("2h")) {
+        priority = "High";
+        labels.add("2 hr ads");
+      }
+
+      [
+        ["poland", "Poland"],
+        ["czech", "Czech"],
+        ["hungary", "Hungary"]
+      ].forEach(([needle, label]) => {
+        if (lower.includes(needle)) labels.add(label);
+      });
+
+      return {
+        project,
+        priority,
+        labels: [...labels].slice(0, 4)
+      };
+    }
+
+    function createBulkTasks(lines, defaults) {
+      return lines.map((line, index) => {
+        const title = titleCaseFirst(line);
+        const meta = inferBulkTaskMeta(title, defaults.project, defaults.priority, defaults.extraLabels);
+        return {
+          id: makeId(),
+          title,
+          description: `Bulk-created media buying task for ${meta.project}. Add budget, KPI, audience, and tracking notes before launch.`,
+          column: defaults.column,
+          priority: meta.priority,
+          project: meta.project,
+          due: defaults.due,
+          assignee: defaults.assignee,
+          createdBy: defaults.createdBy || MY_INITIALS,
+          collaborators: uniqueInitials([defaults.createdBy || MY_INITIALS, defaults.assignee]),
+          labels: meta.labels.length ? meta.labels : ["Media Buying"],
+          comments: 0,
+          avatarColor: ["#f76d57", "#12a89d", "#4c7df0", "#e9a23b", "#3aa76d"][(tasks.length + index) % 5],
+          subtasks: [
+            { text: "Define audience and budget", done: false },
+            { text: "Launch or update campaign", done: false },
+            { text: "Check KPI, tracking, and spend", done: false }
+          ],
+          activity: ["Bulk task created"]
+        };
+      });
+    }
+
+    function openCreateModal(column = "backlog") {
+      state.modalColumn = column;
+      modalTitle.textContent = "Create task";
+      taskForm.reset();
+      document.getElementById("taskIdInput").value = "";
+      columnInput.value = column;
+      document.getElementById("projectInput").value = getDefaultWorkstream();
+      document.getElementById("dueInput").value = toDateInput(2);
+      document.getElementById("assigneeInput").value = getActiveCollaboratorInitials();
+      modalTags = [];
+      modalSubtasks = [];
+      document.getElementById("tagTextInput").value = "";
+      document.getElementById("subtaskTextInput").value = "";
+      renderTaskTagEditor();
+      renderModalSubtasks();
+      taskModal.classList.add("open");
+      setTimeout(() => document.getElementById("titleInput").focus(), 40);
+    }
+
+    function openBulkModal(column = "backlog") {
+      bulkTaskForm.reset();
+      bulkColumnInput.value = column;
+      document.getElementById("bulkProjectInput").value = getDefaultWorkstream();
+      document.getElementById("bulkDueInput").value = toDateInput(1);
+      document.getElementById("bulkAssigneeInput").value = getActiveCollaboratorInitials();
+      document.getElementById("bulkTasksInput").value = bulkExampleLines;
+      bulkModalTags = [];
+      document.getElementById("bulkTagTextInput").value = "";
+      renderBulkTagEditor();
+      bulkModal.classList.add("open");
+      setTimeout(() => document.getElementById("bulkTasksInput").focus(), 40);
+    }
+
+    function openEditModal(task) {
+      modalTitle.textContent = "Edit task";
+      document.getElementById("taskIdInput").value = task.id;
+      document.getElementById("titleInput").value = task.title;
+      document.getElementById("descriptionInput").value = task.description || "";
+      columnInput.value = task.column;
+      document.getElementById("priorityInput").value = task.priority;
+      document.getElementById("projectInput").value = task.project;
+      document.getElementById("dueInput").value = task.due || "";
+      document.getElementById("assigneeInput").value = task.assignee;
+      modalTags = mergeTags(task.labels || []);
+      modalSubtasks = cleanSubtasks(task.subtasks || []);
+      document.getElementById("tagTextInput").value = "";
+      document.getElementById("subtaskTextInput").value = "";
+      renderTaskTagEditor();
+      renderModalSubtasks();
+      taskModal.classList.add("open");
+      setTimeout(() => document.getElementById("titleInput").focus(), 40);
+    }
+
+    function closeModal() {
+      taskModal.classList.remove("open");
+    }
+
+    function closeBulkModal() {
+      bulkModal.classList.remove("open");
+    }
+
+    function showToast(message) {
+      toastText.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function setSyncMessage(status, message) {
+      syncState.status = status;
+      syncState.message = message;
+      renderSyncStatus();
+    }
+
+    function hasSyncConfig() {
+      return Boolean(syncConfig.url && syncConfig.key);
+    }
+
+    function createSyncClient() {
+      if (!hasSyncConfig()) {
+        syncState.client = null;
+        setSyncMessage("local", "Local mode");
+        return null;
+      }
+
+      if (!window.supabase?.createClient) {
+        setSyncMessage("error", "Supabase library unavailable");
+        return null;
+      }
+
+      syncState.client = window.supabase.createClient(syncConfig.url, syncConfig.key, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      });
+      return syncState.client;
+    }
+
+    function openSyncModal() {
+      supabaseUrlInput.value = syncConfig.url || "";
+      supabaseKeyInput.value = syncConfig.key || "";
+      workspaceIdInput.value = syncState.workspaceId || "";
+      syncEmailInput.value = syncConfig.email || "";
+      syncSqlInput.value = syncSql;
+      renderSyncStatus();
+      syncModal.classList.add("open");
+      setTimeout(() => (syncConfig.url ? syncEmailInput : supabaseUrlInput).focus(), 40);
+    }
+
+    function closeSyncModal() {
+      syncModal.classList.remove("open");
+    }
+
+    function saveSyncFormValues() {
+      syncConfig = {
+        url: normalizeName(supabaseUrlInput.value),
+        key: supabaseKeyInput.value.trim(),
+        email: normalizeName(syncEmailInput.value)
+      };
+      saveSyncConfig();
+      syncState.workspaceId = normalizeName(workspaceIdInput.value) || syncState.workspaceId || "";
+      if (syncState.workspaceId) {
+        localStorage.setItem(SYNC_WORKSPACE_KEY, syncState.workspaceId);
+        setWorkspaceIdInUrl(syncState.workspaceId);
+      }
+      createSyncClient();
+    }
+
+    function ensureWorkspaceId() {
+      if (!syncState.workspaceId) {
+        syncState.workspaceId = makeId();
+        localStorage.setItem(SYNC_WORKSPACE_KEY, syncState.workspaceId);
+        setWorkspaceIdInUrl(syncState.workspaceId);
+      }
+      return syncState.workspaceId;
+    }
+
+    async function loadRemoteWorkspace({ createIfMissing = false } = {}) {
+      if (!syncState.client && !createSyncClient()) return false;
+      if (!syncState.workspaceId && !createIfMissing) return false;
+      if (createIfMissing) ensureWorkspaceId();
+
+      setSyncMessage("local", "Connecting...");
+      const { data, error } = await syncState.client
+        .from(WORKSPACE_TABLE)
+        .select("id,title,data,updated_at,updated_by")
+        .eq("id", syncState.workspaceId)
+        .limit(1);
+
+      if (error) {
+        setSyncMessage("error", "Database setup needed");
+        showToast(error.message || "Supabase database error");
+        return false;
+      }
+
+      const row = data?.[0];
+      if (!row) {
+        if (!createIfMissing) {
+          setSyncMessage("error", "Workspace not found");
+          return false;
+        }
+        await saveRemoteWorkspace({ immediate: true });
+        subscribeToWorkspace();
+        syncState.loaded = true;
+        setSyncMessage("online", "Shared online");
+        return true;
+      }
+
+      syncState.loaded = true;
+      syncState.lastRemoteAt = row.updated_at || "";
+      applyWorkspacePayload(row.data);
+      subscribeToWorkspace();
+      setSyncMessage("online", "Shared online");
+      showToast("Shared workspace loaded");
+      return true;
+    }
+
+    async function saveRemoteWorkspace({ immediate = false } = {}) {
+      if (!syncState.client || !syncState.workspaceId || syncState.applyingRemote || syncState.savingRemote) return false;
+      syncState.savingRemote = true;
+      const payload = {
+        id: syncState.workspaceId,
+        title: "FlowTask workspace",
+        data: getWorkspacePayload(),
+        updated_by: syncState.deviceId
+      };
+      const { error } = await syncState.client
+        .from(WORKSPACE_TABLE)
+        .upsert(payload, { onConflict: "id" });
+      syncState.savingRemote = false;
+
+      if (error) {
+        setSyncMessage("error", "Sync paused");
+        if (immediate) showToast(error.message || "Could not sync workspace");
+        return false;
+      }
+
+      syncState.loaded = true;
+      setSyncMessage("online", "Shared online");
+      if (immediate) showToast("Workspace synced");
+      return true;
+    }
+
+    function scheduleRemoteSave() {
+      if (!syncState.client || !syncState.workspaceId || !syncState.loaded || syncState.applyingRemote) return;
+      clearTimeout(syncState.saveTimer);
+      syncState.saveTimer = setTimeout(() => saveRemoteWorkspace(), 650);
+    }
+
+    function subscribeToWorkspace() {
+      if (!syncState.client || !syncState.workspaceId) return;
+      if (syncState.channel) {
+        syncState.client.removeChannel(syncState.channel);
+      }
+      syncState.channel = syncState.client
+        .channel(`flowtask-workspace-${syncState.workspaceId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: WORKSPACE_TABLE,
+            filter: `id=eq.${syncState.workspaceId}`
+          },
+          (payload) => {
+            const row = payload.new;
+            if (!row || row.updated_by === syncState.deviceId || row.updated_at === syncState.lastRemoteAt) return;
+            syncState.lastRemoteAt = row.updated_at || "";
+            applyWorkspacePayload(row.data);
+            setSyncMessage("online", "Updated live");
+          }
+        )
+        .subscribe();
+    }
+
+    async function sendLoginLink() {
+      saveSyncFormValues();
+      const email = normalizeName(syncEmailInput.value);
+      if (!email) {
+        showToast("Add email first");
+        return;
+      }
+      if (!syncState.client && !createSyncClient()) return;
+      const { error } = await syncState.client.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: getShareLink() || window.location.href
+        }
+      });
+      if (error) {
+        setSyncMessage("error", "Login failed");
+        showToast(error.message || "Could not send login link");
+        return;
+      }
+      syncConfig.email = email;
+      saveSyncConfig();
+      showToast("Login link sent");
+    }
+
+    async function syncNow() {
+      saveSyncFormValues();
+      if (!hasSyncConfig()) {
+        showToast("Add Supabase URL and anon key");
+        return;
+      }
+      createSyncClient();
+      await loadRemoteWorkspace({ createIfMissing: true });
+      await saveRemoteWorkspace({ immediate: true });
+      renderSyncStatus();
+    }
+
+    async function initializeSync() {
+      syncSqlInput.value = syncSql;
+      if (syncState.workspaceId) {
+        localStorage.setItem(SYNC_WORKSPACE_KEY, syncState.workspaceId);
+        setWorkspaceIdInUrl(syncState.workspaceId);
+      }
+      if (!hasSyncConfig()) {
+        setSyncMessage("local", "Local mode");
+        return;
+      }
+      const client = createSyncClient();
+      if (!client) return;
+      const { data } = await client.auth.getUser();
+      syncState.user = data?.user || null;
+      client.auth.onAuthStateChange((_event, session) => {
+        syncState.user = session?.user || null;
+        renderSyncStatus();
+      });
+      if (syncState.workspaceId) {
+        await loadRemoteWorkspace();
+      } else {
+        setSyncMessage("local", "Ready to share");
+      }
+    }
+
+    function bindEvents() {
+      lanes.forEach((lane) => {
+        const option = document.createElement("option");
+        option.value = lane.id;
+        option.textContent = lane.title;
+        columnInput.appendChild(option);
+
+        const bulkOption = document.createElement("option");
+        bulkOption.value = lane.id;
+        bulkOption.textContent = lane.title;
+        bulkColumnInput.appendChild(bulkOption);
+      });
+
+      document.getElementById("newTaskBtn").addEventListener("click", () => openCreateModal("backlog"));
+      document.getElementById("bulkTaskBtn").addEventListener("click", () => openBulkModal("backlog"));
+      document.getElementById("addWorkstreamBtn").addEventListener("click", () => openWorkstreamModal());
+      document.getElementById("addCollaboratorBtn").addEventListener("click", addCollaboratorFromPrompt);
+      document.getElementById("manageTagsBtn").addEventListener("click", openTagModal);
+      document.getElementById("openNotesBtn").addEventListener("click", openNotesModal);
+      document.getElementById("openSyncBtn").addEventListener("click", openSyncModal);
+      document.getElementById("copyShareLinkBtn").addEventListener("click", () => copyText(getShareLink(), "Workspace link copied"));
+      document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+      document.getElementById("cancelModalBtn").addEventListener("click", closeModal);
+      document.getElementById("closeBulkModalBtn").addEventListener("click", closeBulkModal);
+      document.getElementById("cancelBulkModalBtn").addEventListener("click", closeBulkModal);
+      document.getElementById("closeWorkstreamModalBtn").addEventListener("click", closeWorkstreamModal);
+      document.getElementById("cancelWorkstreamModalBtn").addEventListener("click", closeWorkstreamModal);
+      document.getElementById("closeTagModalBtn").addEventListener("click", closeTagModal);
+      document.getElementById("doneTagModalBtn").addEventListener("click", closeTagModal);
+      document.getElementById("closeNotesModalBtn").addEventListener("click", closeNotesModal);
+      document.getElementById("cancelNotesModalBtn").addEventListener("click", closeNotesModal);
+      document.getElementById("clearNoteEditBtn").addEventListener("click", clearNoteForm);
+      document.getElementById("closeSyncModalBtn").addEventListener("click", closeSyncModal);
+      document.getElementById("copySyncLinkBtn").addEventListener("click", () => copyText(getShareLink(), "Workspace link copied"));
+      document.getElementById("sendLoginLinkBtn").addEventListener("click", sendLoginLink);
+      document.getElementById("syncNowBtn").addEventListener("click", syncNow);
+      document.getElementById("addTagToTaskBtn").addEventListener("click", () => {
+        const input = document.getElementById("tagTextInput");
+        addTagsToModal(parseTags(input.value));
+        input.value = "";
+      });
+      document.getElementById("addBulkTagBtn").addEventListener("click", () => {
+        const input = document.getElementById("bulkTagTextInput");
+        addTagsToBulkModal(parseTags(input.value));
+        input.value = "";
+      });
+      document.getElementById("addModalSubtaskBtn").addEventListener("click", () => {
+        const input = document.getElementById("subtaskTextInput");
+        addSubtasksToModal([input.value]);
+        input.value = "";
+        input.focus();
+      });
+      document.getElementById("closeDetailsBtn").addEventListener("click", () => document.body.classList.remove("detail-open"));
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        tasks = cloneTasks(defaultTasks);
+        workstreams = cloneTasks(defaultWorkstreams);
+        savedTags = [...defaultSavedTags];
+        collaborators = cloneTasks(defaultCollaborators);
+        state = { ...state, filter: "all", navView: "all", project: "all", tag: "all", collaborator: "all", search: "", selectedId: tasks[0]?.id || null };
+        searchInput.value = "";
+        showToast("Demo board reset");
+        render();
+      });
+
+      taskModal.addEventListener("click", (event) => {
+        if (event.target === taskModal) closeModal();
+      });
+
+      bulkModal.addEventListener("click", (event) => {
+        if (event.target === bulkModal) closeBulkModal();
+      });
+
+      workstreamModal.addEventListener("click", (event) => {
+        if (event.target === workstreamModal) closeWorkstreamModal();
+      });
+
+      tagModal.addEventListener("click", (event) => {
+        if (event.target === tagModal) closeTagModal();
+      });
+
+      notesModal.addEventListener("click", (event) => {
+        if (event.target === notesModal) closeNotesModal();
+      });
+
+      syncModal.addEventListener("click", (event) => {
+        if (event.target === syncModal) closeSyncModal();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeModal();
+          closeBulkModal();
+          closeWorkstreamModal();
+          closeTagModal();
+          closeNotesModal();
+          closeSyncModal();
+          document.body.classList.remove("detail-open");
+        }
+      });
+
+      ["tagTextInput", "bulkTagTextInput", "savedTagInput", "subtaskTextInput"].forEach((id) => {
+        document.getElementById(id).addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            if (id === "tagTextInput") document.getElementById("addTagToTaskBtn").click();
+            if (id === "bulkTagTextInput") document.getElementById("addBulkTagBtn").click();
+            if (id === "savedTagInput") tagForm.requestSubmit();
+            if (id === "subtaskTextInput") document.getElementById("addModalSubtaskBtn").click();
+          }
+        });
+      });
+
+      ["noteSearchInput", "noteGroupFilterInput"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", renderNotesList);
+        document.getElementById(id).addEventListener("keydown", (event) => {
+          if (event.key === "Enter") event.preventDefault();
+        });
+      });
+
+      searchInput.addEventListener("input", () => {
+        state.search = searchInput.value;
+        render();
+      });
+
+      collaboratorFilterInput.addEventListener("change", () => {
+        state.collaborator = collaboratorFilterInput.value;
+        state.filter = "all";
+        render();
+      });
+
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          state.filter = tab.dataset.filter;
+          render();
+        });
+      });
+
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          state.navView = item.dataset.view;
+          state.filter = item.dataset.view === "all" ? "all" : item.dataset.view;
+          render();
+        });
+      });
+
+      syncForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        await syncNow();
+      });
+
+      taskForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const id = document.getElementById("taskIdInput").value;
+        const labels = mergeTags(modalTags).slice(0, 8);
+        const subtasks = cleanSubtasks(modalSubtasks);
+        const actor = getActiveCollaboratorInitials();
+        const assignee = ensureCollaborator(document.getElementById("assigneeInput").value, "Teammate") || MY_INITIALS;
+        ensureCollaborator(actor, actor === MY_INITIALS ? "Me" : "Teammate");
+        const payload = {
+          title: document.getElementById("titleInput").value.trim(),
+          description: document.getElementById("descriptionInput").value.trim(),
+          column: columnInput.value,
+          priority: document.getElementById("priorityInput").value,
+          project: document.getElementById("projectInput").value,
+          due: document.getElementById("dueInput").value,
+          assignee,
+          labels: labels.length ? labels : ["Task"],
+          subtasks
+        };
+        addSavedTags(payload.labels);
+
+        if (id) {
+          const task = tasks.find((item) => item.id === id);
+          const createdBy = task.createdBy || actor;
+          Object.assign(task, payload, {
+            createdBy,
+            collaborators: uniqueInitials([createdBy, actor, assignee])
+          });
+          task.activity = ["Task details updated", ...(task.activity || []).slice(0, 4)];
+          state.selectedId = id;
+          showToast("Task updated");
+        } else {
+          const newTask = {
+            id: makeId(),
+            ...payload,
+            createdBy: actor,
+            collaborators: uniqueInitials([actor, assignee]),
+            comments: 0,
+            avatarColor: ["#f76d57", "#12a89d", "#4c7df0", "#e9a23b"][tasks.length % 4],
+            activity: ["Task created"]
+          };
+          tasks.unshift(newTask);
+          state.selectedId = newTask.id;
+          showToast("Task created");
+        }
+
+        closeModal();
+        render();
+      });
+
+      bulkTaskForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const lines = document.getElementById("bulkTasksInput").value
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+        if (!lines.length) {
+          showToast("Add at least one task line");
+          return;
+        }
+
+        const extraLabels = mergeTags(bulkModalTags);
+        addSavedTags(extraLabels);
+        const actor = getActiveCollaboratorInitials();
+        const assignee = ensureCollaborator(document.getElementById("bulkAssigneeInput").value, "Teammate") || MY_INITIALS;
+        ensureCollaborator(actor, actor === MY_INITIALS ? "Me" : "Teammate");
+
+        const newTasks = createBulkTasks(lines, {
+          column: bulkColumnInput.value,
+          priority: document.getElementById("bulkPriorityInput").value,
+          project: document.getElementById("bulkProjectInput").value,
+          due: document.getElementById("bulkDueInput").value,
+          assignee,
+          createdBy: actor,
+          extraLabels
+        });
+
+        tasks = [...newTasks, ...tasks];
+        state.selectedId = newTasks[0].id;
+        state.filter = "all";
+        state.navView = "all";
+        state.project = "all";
+        closeBulkModal();
+        showToast(`${newTasks.length} bulk tasks created`);
+        render();
+      });
+
+      workstreamForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const id = document.getElementById("workstreamIdInput").value;
+        const name = normalizeName(document.getElementById("workstreamNameInput").value);
+        const color = document.getElementById("workstreamColorInput").value;
+        if (!name) return;
+
+        const duplicate = workstreams.some((item) => item.name.toLowerCase() === name.toLowerCase() && item.id !== id);
+        if (duplicate) {
+          showToast("Workstream already exists");
+          return;
+        }
+
+        if (id) {
+          const workstream = workstreams.find((item) => item.id === id);
+          const oldName = workstream.name;
+          workstream.name = name;
+          workstream.color = color;
+          tasks.forEach((task) => {
+            if (task.project === oldName) task.project = name;
+          });
+          if (state.project === oldName) state.project = name;
+          showToast("Workstream updated");
+        } else {
+          workstreams.push({ id: makeId(), name, color });
+          state.project = name;
+          showToast("Workstream added");
+        }
+
+        closeWorkstreamModal();
+        render();
+      });
+
+      tagForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.getElementById("savedTagInput");
+        const tags = parseTags(input.value);
+        if (!tags.length) return;
+        addSavedTags(tags);
+        input.value = "";
+        renderTagManager();
+        render();
+        showToast("Saved tags updated");
+      });
+
+      noteForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const id = document.getElementById("noteIdInput").value;
+        const group = normalizeName(document.getElementById("noteGroupInput").value) || "General";
+        const title = normalizeName(document.getElementById("noteTitleInput").value);
+        const body = document.getElementById("noteBodyInput").value.trim();
+        if (!body) {
+          showToast("Write a note first");
+          return;
+        }
+
+        if (id) {
+          const note = notes.find((item) => item.id === id);
+          if (note) {
+            note.group = group;
+            note.title = title || "Quick note";
+            note.body = body;
+            note.updatedAt = new Date().toISOString();
+            showToast("Note updated");
+          }
+        } else {
+          notes = [
+            {
+              id: makeId(),
+              group,
+              title: title || "Quick note",
+              body,
+              createdAt: new Date().toISOString(),
+              updatedAt: ""
+            },
+            ...notes
+          ];
+          showToast("Note saved");
+        }
+        saveNotes();
+        clearNoteForm();
+        renderNotesSummary();
+        renderNotesList();
+      });
+    }
+
+    bindEvents();
+    render();
+    initializeSync();
+  </script>
+</body>
+</html>
