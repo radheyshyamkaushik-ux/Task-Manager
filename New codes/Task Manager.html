@@ -5404,6 +5404,9 @@ end $$;`;
         input.focus();
       });
       document.getElementById("reminderEnabledInput").addEventListener("change", setReminderFieldVisibility);
+      document.getElementById("reminderEnabledInput").addEventListener("change", () => {
+        if (document.getElementById("reminderEnabledInput").checked) requestReminderNotifications();
+      });
       document.getElementById("reminderSoundTypeInput").addEventListener("change", setReminderFieldVisibility);
       document.getElementById("reminderGifModeInput").addEventListener("change", setReminderFieldVisibility);
       document.getElementById("dueInput").addEventListener("change", () => {
