@@ -3972,13 +3972,28 @@ end $$;`;
       playBuiltInReminderSound(clean.soundType);
     }
 
+    function getReminderNotificationImage(reminder) {
+      const clean = normalizeReminder(reminder);
+      return clean.gifMode === "custom" && clean.gifUrl ? clean.gifUrl : "";
+    }
+
     function showBrowserReminder(task) {
       if (!("Notification" in window) || Notification.permission !== "granted") return;
       const reminder = normalizeReminder(task.reminder);
-      const notification = new Notification(`FlowTask reminder: ${task.title}`, {
+      const image = getReminderNotificationImage(reminder);
+      const options = {
         body: reminder.note || task.description || `Reminder due ${getReminderLabel(task)}`,
         tag: `flowtask-${task.id}`,
-        requireInteraction: true
+        requireInteraction: true,
+        silent: !reminder.sound
+      };
+      if (image) {
+        options.image = image;
+        options.icon = image;
+        options.badge = image;
+      }
+      const notification = new Notification(`FlowTask reminder: ${task.title}`, {
+        ...options
       });
       notification.onclick = () => {
         window.focus();
