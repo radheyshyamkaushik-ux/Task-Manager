@@ -1609,6 +1609,236 @@
       font-weight: 800;
     }
 
+    .reminder-settings {
+      display: grid;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .reminder-settings.is-hidden,
+    .custom-reminder-field.is-hidden {
+      display: none;
+    }
+
+    .reminder-toggle {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 38px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .reminder-toggle input {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--teal);
+    }
+
+    .reminder-form-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, 0.55fr);
+      gap: 10px;
+    }
+
+    .reminder-list {
+      display: grid;
+      gap: 10px;
+      max-height: 430px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .reminder-item {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 11px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+    }
+
+    .reminder-item.is-overdue {
+      border-color: rgba(220, 76, 76, 0.28);
+      background: var(--danger-soft);
+    }
+
+    .reminder-copy {
+      min-width: 0;
+      display: grid;
+      gap: 7px;
+    }
+
+    .reminder-copy strong {
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .reminder-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .reminder-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .reminder-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 2px;
+    }
+
+    .reminder-visual {
+      width: 64px;
+      height: 64px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--coral);
+      position: relative;
+    }
+
+    .reminder-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .reminder-visual.default::before {
+      content: "";
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--coral);
+      box-shadow: 0 0 0 0 rgba(247, 109, 87, 0.28);
+      animation: reminderPulse 1.4s ease-out infinite;
+    }
+
+    .reminder-visual.default::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      position: absolute;
+      top: 22px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .reminder-visual.campaign::before {
+      content: "";
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, transparent 46%, rgba(255, 255, 255, 0.72) 47% 53%, transparent 54%),
+        linear-gradient(135deg, var(--teal), var(--blue));
+      animation: reminderTilt 1.1s ease-in-out infinite alternate;
+    }
+
+    .reminder-visual.sound::before {
+      content: "";
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 8px solid var(--amber);
+      border-left-color: transparent;
+      animation: reminderSpin 1.2s linear infinite;
+    }
+
+    .notification-help {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      background: var(--panel-soft);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .reminder-popup {
+      position: fixed;
+      right: 20px;
+      bottom: 78px;
+      width: min(390px, calc(100vw - 40px));
+      display: none;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 13px;
+      padding: 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      z-index: 60;
+    }
+
+    .reminder-popup.show {
+      display: grid;
+      animation: slideIn 220ms ease both;
+    }
+
+    .reminder-popup .reminder-visual {
+      width: 72px;
+      height: 72px;
+    }
+
+    .reminder-popup-copy {
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .reminder-popup-copy h3 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .reminder-popup-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .reminder-popup-meta {
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .reminder-popup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
     .empty-inline {
       color: var(--soft);
       font-size: 12px;
@@ -1687,6 +1917,36 @@
       to {
         transform: translateY(0);
         opacity: 1;
+      }
+    }
+
+    @keyframes reminderPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(247, 109, 87, 0.28);
+        transform: scale(0.92);
+      }
+      72% {
+        box-shadow: 0 0 0 20px rgba(247, 109, 87, 0);
+        transform: scale(1);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(247, 109, 87, 0);
+        transform: scale(0.92);
+      }
+    }
+
+    @keyframes reminderTilt {
+      from {
+        transform: rotate(-7deg) scale(0.96);
+      }
+      to {
+        transform: rotate(7deg) scale(1.03);
+      }
+    }
+
+    @keyframes reminderSpin {
+      to {
+        transform: rotate(360deg);
       }
     }
 
@@ -1871,6 +2131,28 @@
         grid-template-columns: 1fr;
       }
 
+      .reminder-form-row,
+      .notification-help {
+        grid-template-columns: 1fr;
+      }
+
+      .notification-help {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .reminder-item,
+      .reminder-popup {
+        grid-template-columns: 1fr;
+      }
+
+      .reminder-popup {
+        left: 14px;
+        right: 14px;
+        bottom: 68px;
+        width: auto;
+      }
+
       .details {
         width: 100%;
       }
@@ -1951,6 +2233,19 @@
             <path d="M8 8h8M8 12h8M8 16h5" />
           </svg>
           Open notes
+        </button>
+      </div>
+
+      <div class="sidebar-card" aria-live="polite">
+        <strong>Reminders</strong>
+        <p id="remindersSummary">No reminders scheduled</p>
+        <button class="button secondary" id="openRemindersBtn" type="button">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 6v6l4 2" />
+            <circle cx="12" cy="12" r="8" />
+            <path d="M4 4l3 3M20 4l-3 3" />
+          </svg>
+          Open reminders
         </button>
       </div>
 
@@ -2142,6 +2437,60 @@
             <label for="assigneeInput">Assignee initials</label>
             <input id="assigneeInput" type="text" maxlength="3" list="collaboratorOptions" placeholder="RK" required />
             <datalist id="collaboratorOptions"></datalist>
+          </div>
+          <div class="form-row wide">
+            <label class="reminder-toggle" for="reminderEnabledInput">
+              <input id="reminderEnabledInput" type="checkbox" />
+              Add reminder
+            </label>
+            <div class="reminder-settings is-hidden" id="reminderSettings">
+              <div class="reminder-form-row">
+                <div class="form-row">
+                  <label for="reminderAtInput">Reminder time</label>
+                  <input id="reminderAtInput" type="datetime-local" />
+                </div>
+                <div class="form-row">
+                  <label for="reminderSoundInput">Sound</label>
+                  <label class="reminder-toggle" for="reminderSoundInput">
+                    <input id="reminderSoundInput" type="checkbox" />
+                    Play sound
+                  </label>
+                </div>
+              </div>
+              <div class="reminder-form-row">
+                <div class="form-row">
+                  <label for="reminderSoundTypeInput">Sound type</label>
+                  <select id="reminderSoundTypeInput">
+                    <option value="chime">Soft chime</option>
+                    <option value="ping">Focus ping</option>
+                    <option value="bell">Alert bell</option>
+                    <option value="custom">Custom audio URL</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label for="reminderGifModeInput">Reminder visual</label>
+                  <select id="reminderGifModeInput">
+                    <option value="default">Default animation</option>
+                    <option value="campaign">Campaign pulse</option>
+                    <option value="sound">Sound waves</option>
+                    <option value="custom">Custom GIF URL</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row custom-reminder-field is-hidden" id="reminderSoundUrlRow">
+                <label for="reminderSoundUrlInput">Custom audio URL</label>
+                <input id="reminderSoundUrlInput" type="url" placeholder="https://example.com/reminder.mp3" />
+              </div>
+              <div class="form-row custom-reminder-field is-hidden" id="reminderGifUrlRow">
+                <label for="reminderGifUrlInput">Custom GIF URL</label>
+                <input id="reminderGifUrlInput" type="url" placeholder="https://example.com/reminder.gif" />
+              </div>
+              <div class="form-row">
+                <label for="reminderNoteInput">Reminder note</label>
+                <textarea id="reminderNoteInput" placeholder="Optional reminder message shown in popup"></textarea>
+              </div>
+              <p class="helper-text">Browser notifications can appear while you work in another tab when this site is open and notification permission is allowed.</p>
+            </div>
           </div>
           <div class="form-row wide">
             <label for="labelsInput">Labels</label>
@@ -2350,6 +2699,32 @@
     </form>
   </div>
 
+  <div class="modal-backdrop" id="remindersModal" role="dialog" aria-modal="true" aria-labelledby="remindersModalTitle">
+    <div class="modal wide-modal">
+      <div class="modal-header">
+        <h2 id="remindersModalTitle">Reminders</h2>
+        <button class="button secondary icon-only" type="button" id="closeRemindersModalBtn" aria-label="Close reminders modal">
+          <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="notification-help">
+          <span id="notificationPermissionText">Browser alerts are optional.</span>
+          <button class="button secondary" type="button" id="enableNotificationsBtn">Enable alerts</button>
+        </div>
+        <div class="form-row">
+          <label id="remindersListLabel">Scheduled reminders</label>
+          <div class="reminder-list" id="remindersList"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button primary" type="button" id="doneRemindersModalBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="syncModal" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
     <form class="modal wide-modal" id="syncForm">
       <div class="modal-header">
@@ -2410,6 +2785,20 @@
     </form>
   </div>
 
+  <div class="reminder-popup" id="reminderPopup" role="alertdialog" aria-live="assertive" aria-labelledby="reminderPopupTitle">
+    <div id="reminderPopupVisual"></div>
+    <div class="reminder-popup-copy">
+      <span class="reminder-popup-meta" id="reminderPopupTime">Reminder</span>
+      <h3 id="reminderPopupTitle">Task reminder</h3>
+      <p id="reminderPopupText">A task reminder is due.</p>
+      <div class="reminder-popup-actions">
+        <button class="button primary" type="button" id="openReminderTaskBtn">Open task</button>
+        <button class="button secondary" type="button" id="snoozeReminderBtn">Snooze 5m</button>
+        <button class="button secondary" type="button" id="dismissReminderBtn">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite">
     <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path d="M20 6 9 17l-5-5" />
@@ -2429,6 +2818,8 @@
     const SYNC_DEVICE_KEY = "flowtask.performance.deviceId.v1";
     const WORKSPACE_TABLE = "flowtask_workspaces";
     const MY_INITIALS = "RK";
+    const REMINDER_CHECK_MS = 15000;
+    const REMINDER_SNOOZE_MINUTES = 5;
     const collaboratorPalette = ["#f76d57", "#12a89d", "#4c7df0", "#e9a23b", "#3aa76d", "#6b5ef7"];
     const syncSql = `create extension if not exists pgcrypto;
 
@@ -2498,6 +2889,15 @@ end $$;`;
       const date = new Date(today);
       date.setDate(today.getDate() + offset);
       return date.toISOString().slice(0, 10);
+    };
+
+    const toDateTimeInput = (date) => {
+      const pad = (value) => String(value).padStart(2, "0");
+      return [
+        date.getFullYear(),
+        pad(date.getMonth() + 1),
+        pad(date.getDate())
+      ].join("-") + `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
     };
 
     const makeId = () => {
@@ -2660,6 +3060,9 @@ end $$;`;
     let modalTags = [];
     let bulkModalTags = [];
     let modalSubtasks = [];
+    let activeReminderId = null;
+    let reminderCheckTimer = null;
+    let reminderAudioContext = null;
     let syncConfig = loadSyncConfig();
     let syncState = {
       client: null,
@@ -2729,6 +3132,17 @@ end $$;`;
     const noteGroupOptions = document.getElementById("noteGroupOptions");
     const notesListLabel = document.getElementById("notesListLabel");
     const saveNoteBtn = document.getElementById("saveNoteBtn");
+    const remindersModal = document.getElementById("remindersModal");
+    const remindersList = document.getElementById("remindersList");
+    const remindersSummary = document.getElementById("remindersSummary");
+    const remindersListLabel = document.getElementById("remindersListLabel");
+    const notificationPermissionText = document.getElementById("notificationPermissionText");
+    const enableNotificationsBtn = document.getElementById("enableNotificationsBtn");
+    const reminderPopup = document.getElementById("reminderPopup");
+    const reminderPopupVisual = document.getElementById("reminderPopupVisual");
+    const reminderPopupTime = document.getElementById("reminderPopupTime");
+    const reminderPopupTitle = document.getElementById("reminderPopupTitle");
+    const reminderPopupText = document.getElementById("reminderPopupText");
     const modalSubtaskList = document.getElementById("modalSubtaskList");
     const toast = document.getElementById("toast");
     const toastText = document.getElementById("toastText");
@@ -2874,7 +3288,9 @@ end $$;`;
         arrowLeft: '<path d="M19 12H5M11 6l-6 6 6 6" />',
         edit: '<path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />',
         trash: '<path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" />',
-        spark: '<path d="M12 2l1.6 6.2L20 10l-6.4 1.8L12 18l-1.6-6.2L4 10l6.4-1.8Z" />'
+        spark: '<path d="M12 2l1.6 6.2L20 10l-6.4 1.8L12 18l-1.6-6.2L4 10l6.4-1.8Z" />',
+        bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" />',
+        volume: '<path d="M11 5 6 9H3v6h3l5 4Z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" />'
       };
       return `<svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">${paths[name] || paths.check}</svg>`;
     }
@@ -2883,6 +3299,30 @@ end $$;`;
       if (!dateString) return "No date";
       const date = new Date(`${dateString}T00:00:00`);
       return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    }
+
+    function formatDateTime(dateTimeString) {
+      if (!dateTimeString) return "No reminder";
+      const date = new Date(dateTimeString);
+      if (Number.isNaN(date.getTime())) return "No reminder";
+      return date.toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    function getReminderDate(reminder) {
+      const value = reminder?.snoozedUntil || reminder?.at || "";
+      if (!value) return null;
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function getReminderLabel(task) {
+      const date = getReminderDate(task.reminder);
+      return date ? formatDateTime(toDateTimeInput(date)) : "No reminder";
     }
 
     function isToday(dateString) {
@@ -2905,7 +3345,7 @@ end $$;`;
     }
 
     function normalizeName(value) {
-      return value.trim().replace(/\s+/g, " ");
+      return String(value || "").trim().replace(/\s+/g, " ");
     }
 
     function normalizeInitials(value) {
@@ -3130,6 +3570,26 @@ end $$;`;
         .filter((subtask) => subtask.text);
     }
 
+    function normalizeReminder(reminder = {}) {
+      const enabled = Boolean(reminder.enabled && reminder.at);
+      const soundType = ["chime", "ping", "bell", "custom"].includes(reminder.soundType) ? reminder.soundType : "chime";
+      const gifMode = ["default", "campaign", "sound", "custom"].includes(reminder.gifMode) ? reminder.gifMode : "default";
+      return {
+        enabled,
+        at: reminder.at || "",
+        note: normalizeName(reminder.note || ""),
+        sound: Boolean(reminder.sound),
+        soundType,
+        soundUrl: String(reminder.soundUrl || "").trim(),
+        gifMode,
+        gifUrl: String(reminder.gifUrl || "").trim(),
+        lastTriggeredAt: reminder.lastTriggeredAt || "",
+        notifiedAt: reminder.notifiedAt || "",
+        dismissedAt: reminder.dismissedAt || "",
+        snoozedUntil: reminder.snoozedUntil || ""
+      };
+    }
+
     function normalizeTask(task) {
       const assignee = normalizeInitials(task.assignee) || MY_INITIALS;
       const createdBy = normalizeInitials(task.createdBy) || MY_INITIALS;
@@ -3140,6 +3600,7 @@ end $$;`;
         comments: Number.isFinite(Number(task.comments)) ? Number(task.comments) : 0,
         labels: Array.isArray(task.labels) ? task.labels : [],
         subtasks: cleanSubtasks(task.subtasks),
+        reminder: normalizeReminder(task.reminder),
         collaborators: uniqueInitials([createdBy, assignee, ...(task.collaborators || [])]),
         activity: Array.isArray(task.activity) ? task.activity : []
       };
@@ -3230,6 +3691,414 @@ end $$;`;
       });
     }
 
+    function getDefaultReminderAt() {
+      const due = document.getElementById("dueInput")?.value || toDateInput(1);
+      let date = new Date(`${due}T09:00`);
+      const minimum = new Date(Date.now() + 30 * 60000);
+      if (Number.isNaN(date.getTime()) || date < minimum) date = minimum;
+      return toDateTimeInput(date);
+    }
+
+    function setReminderFieldVisibility() {
+      const enabled = document.getElementById("reminderEnabledInput").checked;
+      const soundType = document.getElementById("reminderSoundTypeInput").value;
+      const gifMode = document.getElementById("reminderGifModeInput").value;
+      const settings = document.getElementById("reminderSettings");
+      const soundRow = document.getElementById("reminderSoundUrlRow");
+      const gifRow = document.getElementById("reminderGifUrlRow");
+      settings.classList.toggle("is-hidden", !enabled);
+      soundRow.classList.toggle("is-hidden", !enabled || soundType !== "custom");
+      gifRow.classList.toggle("is-hidden", !enabled || gifMode !== "custom");
+      if (enabled && !document.getElementById("reminderAtInput").value) {
+        document.getElementById("reminderAtInput").value = getDefaultReminderAt();
+      }
+    }
+
+    function resetReminderForm() {
+      document.getElementById("reminderEnabledInput").checked = false;
+      document.getElementById("reminderAtInput").value = "";
+      document.getElementById("reminderSoundInput").checked = true;
+      document.getElementById("reminderSoundTypeInput").value = "chime";
+      document.getElementById("reminderSoundUrlInput").value = "";
+      document.getElementById("reminderGifModeInput").value = "default";
+      document.getElementById("reminderGifUrlInput").value = "";
+      document.getElementById("reminderNoteInput").value = "";
+      setReminderFieldVisibility();
+    }
+
+    function populateReminderForm(reminder) {
+      const clean = normalizeReminder(reminder);
+      document.getElementById("reminderEnabledInput").checked = clean.enabled;
+      document.getElementById("reminderAtInput").value = clean.at || "";
+      document.getElementById("reminderSoundInput").checked = clean.sound;
+      document.getElementById("reminderSoundTypeInput").value = clean.soundType;
+      document.getElementById("reminderSoundUrlInput").value = clean.soundUrl || "";
+      document.getElementById("reminderGifModeInput").value = clean.gifMode;
+      document.getElementById("reminderGifUrlInput").value = clean.gifUrl || "";
+      document.getElementById("reminderNoteInput").value = clean.note || "";
+      setReminderFieldVisibility();
+    }
+
+    function getReminderFromForm(existingReminder = {}) {
+      const enabled = document.getElementById("reminderEnabledInput").checked;
+      if (!enabled) return normalizeReminder({ enabled: false });
+
+      const at = document.getElementById("reminderAtInput").value;
+      if (!at) {
+        showToast("Choose reminder time");
+        return null;
+      }
+
+      const soundType = document.getElementById("reminderSoundTypeInput").value;
+      const gifMode = document.getElementById("reminderGifModeInput").value;
+      const next = normalizeReminder({
+        enabled: true,
+        at,
+        note: document.getElementById("reminderNoteInput").value,
+        sound: document.getElementById("reminderSoundInput").checked,
+        soundType,
+        soundUrl: document.getElementById("reminderSoundUrlInput").value,
+        gifMode,
+        gifUrl: document.getElementById("reminderGifUrlInput").value
+      });
+
+      const previous = normalizeReminder(existingReminder);
+      const sameSchedule = previous.enabled && previous.at === next.at && previous.snoozedUntil === next.snoozedUntil;
+      if (sameSchedule) {
+        next.lastTriggeredAt = previous.lastTriggeredAt;
+        next.notifiedAt = previous.notifiedAt;
+        next.dismissedAt = previous.dismissedAt;
+        next.snoozedUntil = previous.snoozedUntil;
+      }
+      return next;
+    }
+
+    function getReminderTasks() {
+      return tasks
+        .filter((task) => task.reminder?.enabled)
+        .sort((a, b) => {
+          const first = getReminderDate(a.reminder)?.getTime() || Number.MAX_SAFE_INTEGER;
+          const second = getReminderDate(b.reminder)?.getTime() || Number.MAX_SAFE_INTEGER;
+          return first - second;
+        });
+    }
+
+    function isReminderOverdue(task) {
+      const date = getReminderDate(task.reminder);
+      return Boolean(date && task.column !== "done" && date <= new Date() && task.reminder.lastTriggeredAt !== toDateTimeInput(date));
+    }
+
+    function renderReminderVisual(reminder, extraClass = "") {
+      const clean = normalizeReminder(reminder);
+      if (clean.gifMode === "custom" && clean.gifUrl) {
+        return `
+          <div class="reminder-visual ${extraClass}">
+            <img src="${escapeHtml(clean.gifUrl)}" alt="Reminder GIF" />
+          </div>
+        `;
+      }
+      return `<div class="reminder-visual ${escapeHtml(clean.gifMode || "default")} ${extraClass}" aria-hidden="true"></div>`;
+    }
+
+    function renderRemindersSummary() {
+      const reminderTasks = getReminderTasks().filter((task) => task.column !== "done");
+      const overdue = reminderTasks.filter(isReminderOverdue).length;
+      if (!reminderTasks.length) {
+        remindersSummary.textContent = "No reminders scheduled";
+        return;
+      }
+      remindersSummary.textContent = overdue
+        ? `${overdue} due now, ${reminderTasks.length} scheduled`
+        : `${reminderTasks.length} scheduled ${reminderTasks.length === 1 ? "reminder" : "reminders"}`;
+    }
+
+    function renderNotificationPermission() {
+      if (!notificationPermissionText || !enableNotificationsBtn) return;
+      if (!("Notification" in window)) {
+        notificationPermissionText.textContent = "Browser alerts are not supported here. In-app popups still work.";
+        enableNotificationsBtn.disabled = true;
+        return;
+      }
+      const status = Notification.permission;
+      notificationPermissionText.textContent = status === "granted"
+        ? "Browser alerts are enabled for other tabs."
+        : status === "denied"
+          ? "Browser alerts are blocked in browser settings."
+          : "Enable browser alerts for Outlook-style popups in other tabs.";
+      enableNotificationsBtn.disabled = status === "granted";
+    }
+
+    function renderRemindersList() {
+      renderNotificationPermission();
+      const reminderTasks = getReminderTasks();
+      remindersListLabel.textContent = reminderTasks.length
+        ? `Scheduled reminders (${reminderTasks.length})`
+        : "Scheduled reminders";
+
+      if (!reminderTasks.length) {
+        remindersList.innerHTML = `<span class="empty-inline">No reminders yet. Add one from a task.</span>`;
+        return;
+      }
+
+      remindersList.innerHTML = reminderTasks.map((task) => {
+        const reminder = normalizeReminder(task.reminder);
+        const date = getReminderDate(reminder);
+        const overdue = isReminderOverdue(task);
+        const status = task.column === "done"
+          ? "Paused because task is done"
+          : overdue
+            ? "Due now"
+            : date
+              ? formatDateTime(toDateTimeInput(date))
+              : "No time";
+        const note = reminder.note || task.description || "Task reminder";
+        return `
+          <article class="reminder-item ${overdue ? "is-overdue" : ""}">
+            ${renderReminderVisual(reminder)}
+            <div class="reminder-copy">
+              <div class="reminder-meta">
+                <span>${escapeHtml(status)}</span>
+                <span>${reminder.sound ? `${icon("volume")} Sound` : "Silent"}</span>
+              </div>
+              <strong>${escapeHtml(task.title)}</strong>
+              <p>${escapeHtml(note)}</p>
+              <div class="reminder-actions">
+                <button class="button secondary" type="button" data-reminder-open="${escapeHtml(task.id)}">Open task</button>
+                <button class="button secondary" type="button" data-reminder-test="${escapeHtml(task.id)}">Test</button>
+                <button class="button secondary" type="button" data-reminder-edit="${escapeHtml(task.id)}">Edit</button>
+                <button class="button danger" type="button" data-reminder-disable="${escapeHtml(task.id)}">Disable</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      remindersList.querySelectorAll("[data-reminder-open]").forEach((button) => {
+        button.addEventListener("click", () => openReminderTask(button.dataset.reminderOpen));
+      });
+      remindersList.querySelectorAll("[data-reminder-test]").forEach((button) => {
+        button.addEventListener("click", () => testReminder(button.dataset.reminderTest));
+      });
+      remindersList.querySelectorAll("[data-reminder-edit]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const task = tasks.find((item) => item.id === button.dataset.reminderEdit);
+          if (task) openEditModal(task);
+        });
+      });
+      remindersList.querySelectorAll("[data-reminder-disable]").forEach((button) => {
+        button.addEventListener("click", () => disableReminder(button.dataset.reminderDisable));
+      });
+    }
+
+    function openRemindersModal() {
+      renderRemindersList();
+      remindersModal.classList.add("open");
+    }
+
+    function closeRemindersModal() {
+      remindersModal.classList.remove("open");
+    }
+
+    async function requestReminderNotifications() {
+      if (!("Notification" in window)) {
+        showToast("Browser alerts are not supported here");
+        renderNotificationPermission();
+        return false;
+      }
+      if (Notification.permission === "granted") {
+        renderNotificationPermission();
+        return true;
+      }
+      if (Notification.permission === "denied") {
+        showToast("Allow notifications in browser settings");
+        renderNotificationPermission();
+        return false;
+      }
+      const permission = await Notification.requestPermission();
+      showToast(permission === "granted" ? "Browser alerts enabled" : "Browser alerts not enabled");
+      renderNotificationPermission();
+      return permission === "granted";
+    }
+
+    function getReminderAudioContext() {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return null;
+      reminderAudioContext = reminderAudioContext || new AudioContext();
+      return reminderAudioContext;
+    }
+
+    function primeReminderAudio() {
+      const context = getReminderAudioContext();
+      if (context?.state === "suspended") {
+        context.resume().catch(() => {});
+      }
+    }
+
+    function playBuiltInReminderSound(type) {
+      const context = getReminderAudioContext();
+      if (!context) return;
+      if (context.state === "suspended") context.resume().catch(() => {});
+      const now = context.currentTime;
+      const patterns = {
+        chime: [660, 880, 990],
+        ping: [880, 0, 1175],
+        bell: [523, 784, 1046]
+      };
+      const tones = patterns[type] || patterns.chime;
+      tones.forEach((frequency, index) => {
+        if (!frequency) return;
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = type === "bell" ? "triangle" : "sine";
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.001, now + index * 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.22, now + index * 0.18 + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.18 + 0.18);
+        oscillator.connect(gain).connect(context.destination);
+        oscillator.start(now + index * 0.18);
+        oscillator.stop(now + index * 0.18 + 0.22);
+      });
+    }
+
+    function playReminderSound(reminder) {
+      const clean = normalizeReminder(reminder);
+      if (!clean.sound) return;
+      if (clean.soundType === "custom" && clean.soundUrl) {
+        const audio = new Audio(clean.soundUrl);
+        audio.volume = 0.72;
+        audio.play().catch(() => playBuiltInReminderSound("chime"));
+        return;
+      }
+      playBuiltInReminderSound(clean.soundType);
+    }
+
+    function showBrowserReminder(task) {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      const reminder = normalizeReminder(task.reminder);
+      const notification = new Notification(`FlowTask reminder: ${task.title}`, {
+        body: reminder.note || task.description || `Reminder due ${getReminderLabel(task)}`,
+        tag: `flowtask-${task.id}`,
+        requireInteraction: true
+      });
+      notification.onclick = () => {
+        window.focus();
+        openReminderTask(task.id);
+        notification.close();
+      };
+    }
+
+    function showReminderPopup(task) {
+      const reminder = normalizeReminder(task.reminder);
+      activeReminderId = task.id;
+      reminderPopupVisual.innerHTML = renderReminderVisual(reminder);
+      reminderPopupTime.textContent = getReminderLabel(task);
+      reminderPopupTitle.textContent = task.title;
+      reminderPopupText.textContent = reminder.note || task.description || "This task reminder is due.";
+      reminderPopup.classList.add("show");
+    }
+
+    function hideReminderPopup() {
+      reminderPopup.classList.remove("show");
+      activeReminderId = null;
+    }
+
+    function triggerReminder(task, { markTriggered = true } = {}) {
+      if (!task?.reminder?.enabled || task.column === "done") return;
+      const reminder = normalizeReminder(task.reminder);
+      const date = getReminderDate(reminder);
+      const triggerKey = date ? toDateTimeInput(date) : reminder.at;
+      if (markTriggered) {
+        task.reminder = {
+          ...reminder,
+          lastTriggeredAt: triggerKey,
+          notifiedAt: new Date().toISOString(),
+          dismissedAt: "",
+          snoozedUntil: reminder.snoozedUntil
+        };
+        saveTasks();
+        scheduleRemoteSave();
+      }
+      playReminderSound(task.reminder);
+      showBrowserReminder(task);
+      showReminderPopup(task);
+      renderRemindersSummary();
+      if (remindersModal.classList.contains("open")) renderRemindersList();
+    }
+
+    function checkReminders() {
+      const now = new Date();
+      const dueTask = getReminderTasks().find((task) => {
+        if (task.column === "done") return false;
+        const date = getReminderDate(task.reminder);
+        if (!date || date > now) return false;
+        return task.reminder.lastTriggeredAt !== toDateTimeInput(date);
+      });
+      if (dueTask) triggerReminder(dueTask);
+    }
+
+    function startReminderWatcher() {
+      clearInterval(reminderCheckTimer);
+      reminderCheckTimer = setInterval(checkReminders, REMINDER_CHECK_MS);
+      checkReminders();
+    }
+
+    function openReminderTask(id) {
+      const task = tasks.find((item) => item.id === id);
+      if (!task) return;
+      state.filter = "all";
+      state.navView = "all";
+      state.project = "all";
+      state.tag = "all";
+      state.selectedId = id;
+      document.body.classList.add("detail-open");
+      closeRemindersModal();
+      hideReminderPopup();
+      render();
+    }
+
+    function snoozeReminder(id, minutes = REMINDER_SNOOZE_MINUTES) {
+      const task = tasks.find((item) => item.id === id);
+      if (!task?.reminder?.enabled) return;
+      const snoozeDate = new Date(Date.now() + minutes * 60000);
+      task.reminder = {
+        ...normalizeReminder(task.reminder),
+        snoozedUntil: toDateTimeInput(snoozeDate),
+        lastTriggeredAt: "",
+        dismissedAt: ""
+      };
+      hideReminderPopup();
+      showToast(`Snoozed ${minutes} minutes`);
+      render();
+    }
+
+    function dismissReminder(id) {
+      const task = tasks.find((item) => item.id === id);
+      if (!task?.reminder?.enabled) return;
+      task.reminder = {
+        ...normalizeReminder(task.reminder),
+        dismissedAt: new Date().toISOString()
+      };
+      hideReminderPopup();
+      showToast("Reminder dismissed");
+      render();
+    }
+
+    function disableReminder(id) {
+      const task = tasks.find((item) => item.id === id);
+      if (!task) return;
+      task.reminder = normalizeReminder({ enabled: false });
+      task.activity = ["Reminder disabled", ...(task.activity || []).slice(0, 4)];
+      showToast("Reminder disabled");
+      render();
+      if (remindersModal.classList.contains("open")) renderRemindersList();
+    }
+
+    function testReminder(id) {
+      const task = tasks.find((item) => item.id === id);
+      if (!task?.reminder?.enabled) return;
+      triggerReminder(task, { markTriggered: false });
+    }
+
     function getFilteredTasks() {
       const query = state.search.trim().toLowerCase();
       return tasks.filter((task) => {
@@ -3239,6 +4108,8 @@ end $$;`;
           task.priority,
           task.project,
           task.assignee,
+          task.reminder?.note,
+          task.reminder?.at,
           ...getTaskCollaborators(task).map(getCollaboratorLabel),
           ...(task.labels || [])
         ].join(" ").toLowerCase();
@@ -3269,6 +4140,7 @@ end $$;`;
       renderStats();
       renderCounts();
       renderNotesSummary();
+      renderRemindersSummary();
       updateShellCopy();
       renderSyncStatus();
       persistLocalWorkspace();
@@ -3594,6 +4466,9 @@ end $$;`;
     function renderTaskCard(task) {
       const progress = taskProgress(task);
       const labels = (task.labels || []).map((label) => `<span class="label">${escapeHtml(label)}</span>`).join("");
+      const reminderMeta = task.reminder?.enabled
+        ? `<span class="meta-item">${icon("bell")}<span>${escapeHtml(getReminderLabel(task))}</span></span>`
+        : "";
       return `
         <article class="task-card ${task.id === state.selectedId ? "selected" : ""}" data-id="${task.id}" draggable="true" tabindex="0">
           <div class="task-top">
@@ -3614,6 +4489,7 @@ end $$;`;
             <div class="task-meta">
               ${renderCollaboratorAvatars(task)}
               <span class="meta-item">${icon("calendar")}<span>${formatDate(task.due)}</span></span>
+              ${reminderMeta}
             </div>
             <span class="meta-item">${icon("message")}<span>${task.comments}</span></span>
           </footer>
@@ -3671,6 +4547,10 @@ end $$;`;
               <span>Due</span>
               <strong>${formatDate(task.due)}</strong>
             </div>
+            <div class="detail-metric">
+              <span>Reminder</span>
+              <strong>${task.reminder?.enabled ? escapeHtml(getReminderLabel(task)) : "Not set"}</strong>
+            </div>
           </div>
           <div class="assignment-row">
             <label for="detailAssigneeInput">Assign task</label>
@@ -3691,6 +4571,7 @@ end $$;`;
             }
             <button class="button secondary" type="button" data-action="moveBack">${icon("arrowLeft")} Move back</button>
             <button class="button secondary" type="button" data-action="moveNext">Move next ${icon("arrowRight")}</button>
+            ${task.reminder?.enabled ? `<button class="button secondary" type="button" data-reminder-action="test">${icon("bell")} Test reminder</button>` : ""}
             <button class="button secondary" type="button" data-action="edit">${icon("edit")} Edit</button>
             <button class="button danger" type="button" data-action="delete">${icon("trash")} Delete</button>
           </div>
@@ -3786,6 +4667,11 @@ end $$;`;
 
       detailsContent.querySelectorAll("[data-action]").forEach((button) => {
         button.addEventListener("click", () => handleDetailAction(button.dataset.action, task.id));
+      });
+      detailsContent.querySelectorAll("[data-reminder-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (button.dataset.reminderAction === "test") testReminder(task.id);
+        });
       });
     }
 
@@ -4174,6 +5060,7 @@ end $$;`;
       modalSubtasks = [];
       document.getElementById("tagTextInput").value = "";
       document.getElementById("subtaskTextInput").value = "";
+      resetReminderForm();
       renderTaskTagEditor();
       renderModalSubtasks();
       taskModal.classList.add("open");
@@ -4208,6 +5095,7 @@ end $$;`;
       modalSubtasks = cleanSubtasks(task.subtasks || []);
       document.getElementById("tagTextInput").value = "";
       document.getElementById("subtaskTextInput").value = "";
+      populateReminderForm(task.reminder);
       renderTaskTagEditor();
       renderModalSubtasks();
       taskModal.classList.add("open");
@@ -4478,6 +5366,7 @@ end $$;`;
       document.getElementById("addCollaboratorBtn").addEventListener("click", addCollaboratorFromPrompt);
       document.getElementById("manageTagsBtn").addEventListener("click", openTagModal);
       document.getElementById("openNotesBtn").addEventListener("click", openNotesModal);
+      document.getElementById("openRemindersBtn").addEventListener("click", openRemindersModal);
       document.getElementById("openSyncBtn").addEventListener("click", openSyncModal);
       document.getElementById("copyShareLinkBtn").addEventListener("click", () => copyText(getShareLink(), "Workspace link copied"));
       document.getElementById("closeModalBtn").addEventListener("click", closeModal);
@@ -4491,6 +5380,9 @@ end $$;`;
       document.getElementById("closeNotesModalBtn").addEventListener("click", closeNotesModal);
       document.getElementById("cancelNotesModalBtn").addEventListener("click", closeNotesModal);
       document.getElementById("clearNoteEditBtn").addEventListener("click", clearNoteForm);
+      document.getElementById("closeRemindersModalBtn").addEventListener("click", closeRemindersModal);
+      document.getElementById("doneRemindersModalBtn").addEventListener("click", closeRemindersModal);
+      enableNotificationsBtn.addEventListener("click", requestReminderNotifications);
       document.getElementById("closeSyncModalBtn").addEventListener("click", closeSyncModal);
       document.getElementById("copySyncLinkBtn").addEventListener("click", () => copyText(getShareLink(), "Workspace link copied"));
       document.getElementById("sendLoginLinkBtn").addEventListener("click", sendLoginLink);
@@ -4511,9 +5403,26 @@ end $$;`;
         input.value = "";
         input.focus();
       });
+      document.getElementById("reminderEnabledInput").addEventListener("change", setReminderFieldVisibility);
+      document.getElementById("reminderSoundTypeInput").addEventListener("change", setReminderFieldVisibility);
+      document.getElementById("reminderGifModeInput").addEventListener("change", setReminderFieldVisibility);
+      document.getElementById("dueInput").addEventListener("change", () => {
+        if (document.getElementById("reminderEnabledInput").checked && !document.getElementById("reminderAtInput").value) {
+          document.getElementById("reminderAtInput").value = getDefaultReminderAt();
+        }
+      });
+      document.getElementById("openReminderTaskBtn").addEventListener("click", () => {
+        if (activeReminderId) openReminderTask(activeReminderId);
+      });
+      document.getElementById("snoozeReminderBtn").addEventListener("click", () => {
+        if (activeReminderId) snoozeReminder(activeReminderId);
+      });
+      document.getElementById("dismissReminderBtn").addEventListener("click", () => {
+        if (activeReminderId) dismissReminder(activeReminderId);
+      });
       document.getElementById("closeDetailsBtn").addEventListener("click", () => document.body.classList.remove("detail-open"));
       document.getElementById("resetBtn").addEventListener("click", () => {
-        tasks = cloneTasks(defaultTasks);
+        tasks = cloneTasks(defaultTasks).map(normalizeTask);
         workstreams = cloneTasks(defaultWorkstreams);
         savedTags = [...defaultSavedTags];
         collaborators = cloneTasks(defaultCollaborators);
@@ -4543,6 +5452,10 @@ end $$;`;
         if (event.target === notesModal) closeNotesModal();
       });
 
+      remindersModal.addEventListener("click", (event) => {
+        if (event.target === remindersModal) closeRemindersModal();
+      });
+
       syncModal.addEventListener("click", (event) => {
         if (event.target === syncModal) closeSyncModal();
       });
@@ -4554,9 +5467,16 @@ end $$;`;
           closeWorkstreamModal();
           closeTagModal();
           closeNotesModal();
+          closeRemindersModal();
+          hideReminderPopup();
           closeSyncModal();
           document.body.classList.remove("detail-open");
         }
+      });
+
+      document.addEventListener("pointerdown", primeReminderAudio);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) checkReminders();
       });
 
       ["tagTextInput", "bulkTagTextInput", "savedTagInput", "subtaskTextInput"].forEach((id) => {
@@ -4612,8 +5532,11 @@ end $$;`;
       taskForm.addEventListener("submit", (event) => {
         event.preventDefault();
         const id = document.getElementById("taskIdInput").value;
+        const existingTask = id ? tasks.find((item) => item.id === id) : null;
         const labels = mergeTags(modalTags).slice(0, 8);
         const subtasks = cleanSubtasks(modalSubtasks);
+        const reminder = getReminderFromForm(existingTask?.reminder || {});
+        if (!reminder) return;
         const actor = getActiveCollaboratorInitials();
         const assignee = ensureCollaborator(document.getElementById("assigneeInput").value, "Teammate") || MY_INITIALS;
         ensureCollaborator(actor, actor === MY_INITIALS ? "Me" : "Teammate");
@@ -4626,12 +5549,13 @@ end $$;`;
           due: document.getElementById("dueInput").value,
           assignee,
           labels: labels.length ? labels : ["Task"],
-          subtasks
+          subtasks,
+          reminder
         };
         addSavedTags(payload.labels);
 
         if (id) {
-          const task = tasks.find((item) => item.id === id);
+          const task = existingTask;
           const createdBy = task.createdBy || actor;
           Object.assign(task, payload, {
             createdBy,
@@ -4785,6 +5709,7 @@ end $$;`;
 
     bindEvents();
     render();
+    startReminderWatcher();
     initializeSync();
   </script>
 </body>
