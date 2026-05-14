@@ -218,6 +218,10 @@
       border-radius: 8px;
     }
 
+    .project-row.is-reordering {
+      grid-template-columns: minmax(0, 1fr) repeat(4, auto);
+    }
+
     .project-row.all-row .project-main {
       grid-column: 1 / -1;
     }
@@ -257,6 +261,22 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .collaborator-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 4px;
+      align-items: center;
+      border-radius: 8px;
+    }
+
+    .collaborator-row.is-reordering {
+      grid-template-columns: minmax(0, 1fr) repeat(4, auto);
+    }
+
+    .collaborator-row.all-row .collaborator-item {
+      grid-column: 1 / -1;
     }
 
     .collaborator-item {
@@ -341,6 +361,16 @@
     .mini-action:hover {
       color: var(--ink);
       background: #eef3f8;
+    }
+
+    .mini-action:disabled {
+      cursor: not-allowed;
+      opacity: 0.28;
+    }
+
+    .mini-action:disabled:hover {
+      color: var(--soft);
+      background: transparent;
     }
 
     .mini-action.danger:hover {
@@ -561,6 +591,12 @@
       color: #ffffff;
       background: var(--coral);
       box-shadow: 0 10px 22px rgba(247, 109, 87, 0.25);
+    }
+
+    .button.active {
+      color: var(--ink);
+      border-color: rgba(18, 168, 157, 0.36);
+      background: var(--teal-soft);
     }
 
     .button.icon-only {
@@ -874,6 +910,14 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+
+    .assigned-copy {
+      margin: -4px 0 0;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.3;
     }
 
     .label-row {
@@ -2107,7 +2151,7 @@
 
       .actions {
         display: grid;
-        grid-template-columns: auto auto 1fr;
+        grid-template-columns: auto auto auto 1fr;
       }
 
       .actions .button.secondary {
@@ -2330,6 +2374,13 @@
         </label>
 
         <div class="actions">
+          <button class="button secondary" id="rearrangeBtn" type="button">
+            <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M8 7h12M8 17h12" />
+              <path d="M4 5v14M2 7l2-2 2 2M2 17l2 2 2-2" />
+            </svg>
+            <span>Rearrange</span>
+          </button>
           <button class="button secondary" id="resetBtn" type="button">
             <svg class="icon small" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M3 12a9 9 0 1 0 3-6.7" />
@@ -3085,6 +3136,7 @@ end $$;`;
       project: "all",
       tag: "all",
       collaborator: "all",
+      reorderMode: false,
       search: "",
       selectedId: tasks[0]?.id || null,
       modalColumn: "backlog"
@@ -3236,6 +3288,7 @@ end $$;`;
       const taskCollaborators = (tasks || []).flatMap((task) => [
         task.assignee,
         task.createdBy,
+        task.assignedBy,
         ...(task.collaborators || [])
       ]).filter(Boolean).map((initials) => ({
         initials,
@@ -3286,6 +3339,8 @@ end $$;`;
         check: '<path d="M20 6 9 17l-5-5" />',
         arrowRight: '<path d="M5 12h14M13 6l6 6-6 6" />',
         arrowLeft: '<path d="M19 12H5M11 6l-6 6 6 6" />',
+        arrowUp: '<path d="M12 19V5M6 11l6-6 6 6" />',
+        arrowDown: '<path d="M12 5v14M18 13l-6 6-6-6" />',
         edit: '<path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />',
         trash: '<path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" />',
         spark: '<path d="M12 2l1.6 6.2L20 10l-6.4 1.8L12 18l-1.6-6.2L4 10l6.4-1.8Z" />',
@@ -3372,7 +3427,8 @@ end $$;`;
         id: collaborator?.id || initials.toLowerCase(),
         initials,
         name: normalizeName(collaborator?.name || (initials === MY_INITIALS ? "Me" : "Teammate")),
-        color: collaborator?.color || collaboratorPalette[index % collaboratorPalette.length]
+        color: collaborator?.color || collaboratorPalette[index % collaboratorPalette.length],
+        order: Number.isFinite(Number(collaborator?.order)) ? Number(collaborator.order) : index
       };
     }
 
@@ -3385,10 +3441,12 @@ end $$;`;
         map.set(collaborator.initials, existing ? { ...existing, ...collaborator } : collaborator);
       });
       return [...map.values()].sort((a, b) => {
+        const orderDiff = (Number.isFinite(Number(a.order)) ? Number(a.order) : 9999) - (Number.isFinite(Number(b.order)) ? Number(b.order) : 9999);
+        if (orderDiff !== 0) return orderDiff;
         if (a.initials === MY_INITIALS) return -1;
         if (b.initials === MY_INITIALS) return 1;
         return a.name.localeCompare(b.name);
-      });
+      }).map((item, index) => ({ ...item, order: index }));
     }
 
     function ensureCollaborator(initials, name = "Teammate") {
@@ -3400,7 +3458,8 @@ end $$;`;
           id: clean.toLowerCase(),
           initials: clean,
           name: normalizeName(name) || "Teammate",
-          color: collaboratorPalette[collaborators.length % collaboratorPalette.length]
+          color: collaboratorPalette[collaborators.length % collaboratorPalette.length],
+          order: collaborators.length
         }]);
         saveCollaborators();
       }
@@ -3418,6 +3477,10 @@ end $$;`;
       return collaborator ? `${collaborator.name} (${collaborator.initials})` : initials;
     }
 
+    function getAssignerLabel(task) {
+      return getCollaboratorLabel(task.assignedBy || task.createdBy || MY_INITIALS);
+    }
+
     function getActiveCollaboratorInitials() {
       return state.collaborator === "all" ? MY_INITIALS : state.collaborator;
     }
@@ -3425,6 +3488,7 @@ end $$;`;
     function getTaskCollaborators(task) {
       return uniqueInitials([
         task.createdBy || MY_INITIALS,
+        task.assignedBy || task.createdBy || MY_INITIALS,
         task.assignee || MY_INITIALS,
         ...(task.collaborators || [])
       ]);
@@ -3433,6 +3497,18 @@ end $$;`;
     function taskVisibleToCollaborator(task, initials) {
       if (initials === "all") return true;
       return getTaskCollaborators(task).includes(normalizeInitials(initials));
+    }
+
+    function withOrder(items) {
+      return items.map((item, index) => ({ ...item, order: index }));
+    }
+
+    function moveByIndex(items, index, direction) {
+      const target = index + direction;
+      if (target < 0 || target >= items.length) return items;
+      const next = [...items];
+      [next[index], next[target]] = [next[target], next[index]];
+      return withOrder(next);
     }
 
     function parseTags(value) {
@@ -3593,15 +3669,17 @@ end $$;`;
     function normalizeTask(task) {
       const assignee = normalizeInitials(task.assignee) || MY_INITIALS;
       const createdBy = normalizeInitials(task.createdBy) || MY_INITIALS;
+      const assignedBy = normalizeInitials(task.assignedBy || task.createdBy) || MY_INITIALS;
       return {
         ...task,
         assignee,
         createdBy,
+        assignedBy,
         comments: Number.isFinite(Number(task.comments)) ? Number(task.comments) : 0,
         labels: Array.isArray(task.labels) ? task.labels : [],
         subtasks: cleanSubtasks(task.subtasks),
         reminder: normalizeReminder(task.reminder),
-        collaborators: uniqueInitials([createdBy, assignee, ...(task.collaborators || [])]),
+        collaborators: uniqueInitials([createdBy, assignedBy, assignee, ...(task.collaborators || [])]),
         activity: Array.isArray(task.activity) ? task.activity : []
       };
     }
@@ -3633,9 +3711,9 @@ end $$;`;
         updatedAt: note.updatedAt || ""
       })) : notes;
       collaborators = mergeCollaborators(
+        tasks.flatMap((task) => getTaskCollaborators(task).map((initials) => ({ initials }))),
         defaultCollaborators,
-        Array.isArray(data.collaborators) ? data.collaborators : [],
-        tasks.flatMap((task) => getTaskCollaborators(task).map((initials) => ({ initials })))
+        Array.isArray(data.collaborators) ? data.collaborators : []
       );
       if (!tasks.some((task) => task.id === state.selectedId)) {
         state.selectedId = tasks[0]?.id || null;
@@ -4135,7 +4213,7 @@ end $$;`;
         const filter = state.filter === "all" ||
           (state.filter === "today" && isToday(task.due)) ||
           (state.filter === "high" && task.priority === "High") ||
-          (state.filter === "mine" && task.assignee === MY_INITIALS);
+          (state.filter === "mine" && task.assignee === getActiveCollaboratorInitials());
         const nav = state.navView === "all" ||
           (state.navView === "today" && isToday(task.due)) ||
           (state.navView === "high" && task.priority === "High") ||
@@ -4183,13 +4261,21 @@ end $$;`;
             <span class="tag-count">${tasks.length}</span>
           </button>
         </div>
-        ${workstreams.map((workstream) => `
-          <div class="project-row">
+        ${workstreams.map((workstream, index) => `
+          <div class="project-row ${state.reorderMode ? "is-reordering" : ""}">
             <button class="project-main ${state.project === workstream.name ? "active" : ""}" type="button" data-project="${escapeHtml(workstream.name)}">
               <span class="dot" style="color: ${escapeHtml(workstream.color)}"></span>
               <span>${escapeHtml(workstream.name)}</span>
               <span class="tag-count">${workstreamCounts[workstream.name] || 0}</span>
             </button>
+            ${state.reorderMode ? `
+              <button class="mini-action" type="button" data-move-workstream-up="${index}" aria-label="Move ${escapeHtml(workstream.name)} up" ${index === 0 ? "disabled" : ""}>
+                ${icon("arrowUp")}
+              </button>
+              <button class="mini-action" type="button" data-move-workstream-down="${index}" aria-label="Move ${escapeHtml(workstream.name)} down" ${index === workstreams.length - 1 ? "disabled" : ""}>
+                ${icon("arrowDown")}
+              </button>
+            ` : ""}
             <button class="mini-action" type="button" data-edit-workstream="${escapeHtml(workstream.id)}" aria-label="Rename ${escapeHtml(workstream.name)}">
               ${icon("edit")}
             </button>
@@ -4231,6 +4317,12 @@ end $$;`;
       workstreamList.querySelectorAll("[data-delete-workstream]").forEach((button) => {
         button.addEventListener("click", () => deleteWorkstream(button.dataset.deleteWorkstream));
       });
+      workstreamList.querySelectorAll("[data-move-workstream-up]").forEach((button) => {
+        button.addEventListener("click", () => moveWorkstream(Number(button.dataset.moveWorkstreamUp), -1));
+      });
+      workstreamList.querySelectorAll("[data-move-workstream-down]").forEach((button) => {
+        button.addEventListener("click", () => moveWorkstream(Number(button.dataset.moveWorkstreamDown), 1));
+      });
       tagList.querySelectorAll("[data-tag]").forEach((button) => {
         button.addEventListener("click", () => {
           state.tag = button.dataset.tag;
@@ -4244,21 +4336,40 @@ end $$;`;
         { initials: "all", name: "All team", color: "#1b2430" },
         ...collaborators
       ];
-      collaboratorList.innerHTML = items.map((collaborator) => {
+      collaboratorList.innerHTML = items.map((collaborator, index) => {
         const isAll = collaborator.initials === "all";
+        const collaboratorIndex = index - 1;
         const count = isAll
           ? tasks.length
           : tasks.filter((task) => taskVisibleToCollaborator(task, collaborator.initials)).length;
         const subtitle = isAll ? "Every shared task" : `${collaborator.initials} workspace`;
         return `
-          <button class="collaborator-item ${state.collaborator === collaborator.initials ? "active" : ""}" type="button" data-collaborator="${escapeHtml(collaborator.initials)}">
-            <span class="collaborator-avatar" style="background:${escapeHtml(collaborator.color)}">${escapeHtml(isAll ? "ALL" : collaborator.initials)}</span>
-            <span class="collaborator-copy">
-              <strong>${escapeHtml(collaborator.name)}</strong>
-              <span>${escapeHtml(subtitle)}</span>
-            </span>
-            <span class="tag-count">${count}</span>
-          </button>
+          <div class="collaborator-row ${isAll ? "all-row" : ""} ${state.reorderMode && !isAll ? "is-reordering" : ""}">
+            <button class="collaborator-item ${state.collaborator === collaborator.initials ? "active" : ""}" type="button" data-collaborator="${escapeHtml(collaborator.initials)}">
+              <span class="collaborator-avatar" style="background:${escapeHtml(collaborator.color)}">${escapeHtml(isAll ? "ALL" : collaborator.initials)}</span>
+              <span class="collaborator-copy">
+                <strong>${escapeHtml(collaborator.name)}</strong>
+                <span>${escapeHtml(subtitle)}</span>
+              </span>
+              <span class="tag-count">${count}</span>
+            </button>
+            ${!isAll && state.reorderMode ? `
+              <button class="mini-action" type="button" data-move-collaborator-up="${collaboratorIndex}" aria-label="Move ${escapeHtml(collaborator.name)} up" ${collaboratorIndex === 0 ? "disabled" : ""}>
+                ${icon("arrowUp")}
+              </button>
+              <button class="mini-action" type="button" data-move-collaborator-down="${collaboratorIndex}" aria-label="Move ${escapeHtml(collaborator.name)} down" ${collaboratorIndex === collaborators.length - 1 ? "disabled" : ""}>
+                ${icon("arrowDown")}
+              </button>
+            ` : ""}
+            ${!isAll ? `
+              <button class="mini-action" type="button" data-edit-collaborator="${escapeHtml(collaborator.initials)}" aria-label="Rename ${escapeHtml(collaborator.name)}">
+                ${icon("edit")}
+              </button>
+              <button class="mini-action danger" type="button" data-delete-collaborator="${escapeHtml(collaborator.initials)}" aria-label="Delete ${escapeHtml(collaborator.name)}">
+                ${icon("trash")}
+              </button>
+            ` : ""}
+          </div>
         `;
       }).join("");
 
@@ -4268,6 +4379,18 @@ end $$;`;
           state.filter = "all";
           render();
         });
+      });
+      collaboratorList.querySelectorAll("[data-edit-collaborator]").forEach((button) => {
+        button.addEventListener("click", () => renameCollaborator(button.dataset.editCollaborator));
+      });
+      collaboratorList.querySelectorAll("[data-delete-collaborator]").forEach((button) => {
+        button.addEventListener("click", () => deleteCollaborator(button.dataset.deleteCollaborator));
+      });
+      collaboratorList.querySelectorAll("[data-move-collaborator-up]").forEach((button) => {
+        button.addEventListener("click", () => moveCollaborator(Number(button.dataset.moveCollaboratorUp), -1));
+      });
+      collaboratorList.querySelectorAll("[data-move-collaborator-down]").forEach((button) => {
+        button.addEventListener("click", () => moveCollaborator(Number(button.dataset.moveCollaboratorDown), 1));
       });
     }
 
@@ -4492,6 +4615,7 @@ end $$;`;
           </div>
           <h3 class="task-title">${escapeHtml(task.title)}</h3>
           <p class="task-desc">${escapeHtml(task.description || "No description yet.")}</p>
+          <p class="assigned-copy">Assigned by ${escapeHtml(getAssignerLabel(task))}</p>
           <div class="label-row">${labels}</div>
           <div class="task-progress" aria-label="${progress}% complete">
             <div class="progress-meta">
@@ -4557,6 +4681,10 @@ end $$;`;
             <div class="detail-metric">
               <span>Assignee</span>
               <strong>${escapeHtml(task.assignee)}</strong>
+            </div>
+            <div class="detail-metric">
+              <span>Assigned by</span>
+              <strong>${escapeHtml(getAssignerLabel(task))}</strong>
             </div>
             <div class="detail-metric">
               <span>Due</span>
@@ -4736,11 +4864,19 @@ end $$;`;
         const active = tab.dataset.filter === state.filter;
         tab.classList.toggle("active", active);
         tab.setAttribute("aria-selected", String(active));
+        if (tab.dataset.filter === "mine") {
+          tab.textContent = state.collaborator === "all" ? "Assigned to me" : `Assigned to ${state.collaborator}`;
+        }
       });
 
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.classList.toggle("active", item.dataset.view === state.navView);
       });
+
+      const rearrangeBtn = document.getElementById("rearrangeBtn");
+      if (rearrangeBtn) {
+        rearrangeBtn.classList.toggle("active", state.reorderMode);
+      }
 
     }
 
@@ -4842,8 +4978,9 @@ end $$;`;
       const actor = getActiveCollaboratorInitials();
       ensureCollaborator(actor, actor === MY_INITIALS ? "Me" : "Teammate");
       task.assignee = assignee;
+      task.assignedBy = actor;
       task.collaborators = uniqueInitials([task.createdBy || actor, actor, assignee]);
-      task.activity = [`Assigned to ${assignee}`, ...(task.activity || []).slice(0, 4)];
+      task.activity = [`Assigned to ${assignee} by ${actor}`, ...(task.activity || []).slice(0, 4)];
       showToast(`Assigned to ${assignee}`);
       render();
     }
@@ -4888,6 +5025,12 @@ end $$;`;
       render();
     }
 
+    function moveWorkstream(index, direction) {
+      workstreams = moveByIndex(workstreams, index, direction);
+      showToast("Workstreams rearranged");
+      render();
+    }
+
     function openTagModal() {
       renderTagManager();
       tagModal.classList.add("open");
@@ -4913,10 +5056,50 @@ end $$;`;
         id: initials.toLowerCase(),
         initials,
         name: name || "Teammate",
-        color: collaboratorPalette[collaborators.length % collaboratorPalette.length]
+        color: collaboratorPalette[collaborators.length % collaboratorPalette.length],
+        order: collaborators.length
       }]);
       state.collaborator = initials;
       showToast("Collaborator added");
+      render();
+    }
+
+    function renameCollaborator(initials) {
+      const collaborator = getCollaborator(initials);
+      if (!collaborator) return;
+      const name = normalizeName(window.prompt("Rename collaborator", collaborator.name) || "");
+      if (!name) return;
+      collaborator.name = name;
+      collaborators = withOrder(collaborators);
+      showToast("Collaborator renamed");
+      render();
+    }
+
+    function deleteCollaborator(initials) {
+      const clean = normalizeInitials(initials);
+      const collaborator = getCollaborator(clean);
+      if (!collaborator) return;
+      if (clean === MY_INITIALS) {
+        showToast("Keep your own collaborator");
+        return;
+      }
+      const confirmed = window.confirm(`Delete "${collaborator.name}"? Assigned tasks will move to ${MY_INITIALS}.`);
+      if (!confirmed) return;
+      tasks.forEach((task) => {
+        if (task.assignee === clean) task.assignee = MY_INITIALS;
+        if (task.createdBy === clean) task.createdBy = MY_INITIALS;
+        if (task.assignedBy === clean) task.assignedBy = MY_INITIALS;
+        task.collaborators = getTaskCollaborators(task).filter((initial) => initial !== clean);
+      });
+      collaborators = withOrder(collaborators.filter((item) => item.initials !== clean));
+      if (state.collaborator === clean) state.collaborator = "all";
+      showToast("Collaborator deleted");
+      render();
+    }
+
+    function moveCollaborator(index, direction) {
+      collaborators = moveByIndex(collaborators, index, direction);
+      showToast("Collaborators rearranged");
       render();
     }
 
@@ -5048,6 +5231,7 @@ end $$;`;
           due: defaults.due,
           assignee: defaults.assignee,
           createdBy: defaults.createdBy || MY_INITIALS,
+          assignedBy: defaults.createdBy || MY_INITIALS,
           collaborators: uniqueInitials([defaults.createdBy || MY_INITIALS, defaults.assignee]),
           labels: meta.labels.length ? meta.labels : ["Media Buying"],
           comments: 0,
@@ -5376,6 +5560,11 @@ end $$;`;
       });
 
       document.getElementById("newTaskBtn").addEventListener("click", () => openCreateModal("backlog"));
+      document.getElementById("rearrangeBtn").addEventListener("click", () => {
+        state.reorderMode = !state.reorderMode;
+        showToast(state.reorderMode ? "Rearrange mode on" : "Rearrange mode off");
+        render();
+      });
       document.getElementById("bulkTaskBtn").addEventListener("click", () => openBulkModal("backlog"));
       document.getElementById("addWorkstreamBtn").addEventListener("click", () => openWorkstreamModal());
       document.getElementById("addCollaboratorBtn").addEventListener("click", addCollaboratorFromPrompt);
@@ -5444,7 +5633,7 @@ end $$;`;
         workstreams = cloneTasks(defaultWorkstreams);
         savedTags = [...defaultSavedTags];
         collaborators = cloneTasks(defaultCollaborators);
-        state = { ...state, filter: "all", navView: "all", project: "all", tag: "all", collaborator: "all", search: "", selectedId: tasks[0]?.id || null };
+        state = { ...state, filter: "all", navView: "all", project: "all", tag: "all", collaborator: "all", reorderMode: false, search: "", selectedId: tasks[0]?.id || null };
         searchInput.value = "";
         showToast("Demo board reset");
         render();
@@ -5575,11 +5764,17 @@ end $$;`;
         if (id) {
           const task = existingTask;
           const createdBy = task.createdBy || actor;
+          const assigneeChanged = task.assignee !== assignee;
+          const assignedBy = assigneeChanged ? actor : (task.assignedBy || actor);
           Object.assign(task, payload, {
             createdBy,
-            collaborators: uniqueInitials([createdBy, actor, assignee])
+            assignedBy,
+            collaborators: uniqueInitials([createdBy, assignedBy, actor, assignee])
           });
-          task.activity = ["Task details updated", ...(task.activity || []).slice(0, 4)];
+          task.activity = [
+            assigneeChanged ? `Assigned to ${assignee} by ${actor}` : "Task details updated",
+            ...(task.activity || []).slice(0, 4)
+          ];
           state.selectedId = id;
           showToast("Task updated");
         } else {
@@ -5587,6 +5782,7 @@ end $$;`;
             id: makeId(),
             ...payload,
             createdBy: actor,
+            assignedBy: actor,
             collaborators: uniqueInitials([actor, assignee]),
             comments: 0,
             avatarColor: ["#f76d57", "#12a89d", "#4c7df0", "#e9a23b"][tasks.length % 4],
@@ -5663,7 +5859,7 @@ end $$;`;
           if (state.project === oldName) state.project = name;
           showToast("Workstream updated");
         } else {
-          workstreams.push({ id: makeId(), name, color });
+          workstreams.push({ id: makeId(), name, color, order: workstreams.length });
           state.project = name;
           showToast("Workstream added");
         }
